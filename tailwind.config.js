@@ -6,9 +6,11 @@ module.exports = {
       colors: {
         primary: {
           paper: "#1E293B",
+          paperLight: "#334155",
           dark: "#0F172A",
           accent: "#0EA5E9",
           accentLight: "#38bdf8",
+          accentDark: "#0284C7",
           light: "#ffffff",
         },
       },
