@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, formatISO } from "date-fns";
 import { useState } from "react";
 import {
   FormProvider,
@@ -14,6 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import PressableButton from "../components/pressable-button";
 import TextFormInput from "../components/text-form-input";
+import HttpStatusCode from "../shared/http-status-codes";
+import { useSupabase } from "../shared/supabase.provider";
+import DatabaseTables from "../shared/types/db";
 import { DATE_FORMAT } from "../shared/utils";
 
 const userSchema = z.object({
@@ -26,25 +29,35 @@ const userSchema = z.object({
     .min(2, "Name is required")
     .max(50, "Name is too long"),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
-  phone: z
+  phoneNumber: z
     .string()
     .min(6, "Phone number is too short")
     .optional()
     .or(z.literal("")),
-  height: z.coerce
-    .number()
-    .min(100, "Height in cm")
-    .max(250, "Height in cm")
+  height: z
+    .number({
+      coerce: true,
+      errorMap: () => ({
+        message: "Invalid number format",
+      }),
+    })
+    .min(100, "Too low value")
+    .max(250, "Too high value")
     .optional()
     .or(z.literal("")),
-  weight: z.coerce
-    .number()
-    .min(20, "Weight in kg")
-    .max(500, "Weight in kg")
+  weight: z
+    .number({
+      coerce: true,
+      errorMap: () => ({
+        message: "Invalid number format",
+      }),
+    })
+    .min(20, "Too low value")
+    .max(500, "Too high value")
     .optional()
     .or(z.literal("")),
   dateOfBirth: z.date().optional(),
-  goals: z.string().optional(),
+  goals: z.string().optional().nullable(),
   notes: z.string().optional(),
 });
 
@@ -53,12 +66,14 @@ type FormValues = z.infer<typeof userSchema>;
 export default function TabOneScreen() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  const { queryBuilder, client } = useSupabase();
+
   const { ...methods } = useForm<FormValues>({
     resolver: zodResolver(userSchema),
     reValidateMode: "onSubmit",
   });
 
-  const { watch, setValue, handleSubmit } = methods;
+  const { watch, setValue, handleSubmit, setError } = methods;
 
   const date = watch("dateOfBirth");
 
@@ -76,13 +91,64 @@ export default function TabOneScreen() {
     hideDatePicker();
   };
 
-  const onSubmit: SubmitHandler<FormValues> = data => {
-    console.log({ data });
+  const onSubmit: SubmitHandler<FormValues> = async data => {
+    if (queryBuilder) {
+      const response = await queryBuilder(DatabaseTables.CLIENTS).insert({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email || null,
+        phone_number: data.phoneNumber || null,
+        height:
+          data.height && typeof data.height === "number"
+            ? Number(data.height)
+            : null,
+        weight:
+          data.weight && typeof data.weight === "number"
+            ? Number(data.weight)
+            : null,
+        date_of_birth: data.dateOfBirth
+          ? formatISO(data.dateOfBirth)
+          : null,
+        goals: data.goals || null,
+        notes: data.notes || null,
+      });
+      if (response.status !== HttpStatusCode.CREATED) {
+        console.warn(response.error?.message);
+      }
+      if (response?.error) {
+        if (response.status === HttpStatusCode.CONFLICT) {
+          console.log("hello error", response.error);
+          if (response.error.message.includes("email_key")) {
+            setError(
+              "email",
+              {
+                message: "Email already exists",
+              },
+              { shouldFocus: true }
+            );
+          }
+          if (response.error.message.includes("phone_number_key")) {
+            setError(
+              "phoneNumber",
+              {
+                message: "Phone already exists",
+              },
+              { shouldFocus: true }
+            );
+          }
+        }
+      }
+    }
   };
 
-  const onError: SubmitErrorHandler<FormValues> = (errors, e) => {
-    return console.log(errors);
-  };
+  async function gitSumUsers() {
+    if (client) {
+      const resp = await client
+        .from("clients")
+        .select("*", { count: "exact" });
+      console.log("response", resp.count);
+    }
+  }
 
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-primary-light dark:bg-primary-dark">
@@ -104,7 +170,7 @@ export default function TabOneScreen() {
           </View>
           <View>
             <TextFormInput
-              name="phone"
+              name="phoneNumber"
               keyboardType="phone-pad"
               label="Phone number"
               placeholder="+387655533221"
@@ -160,12 +226,12 @@ export default function TabOneScreen() {
             <PressableButton
               type="secondary"
               label="Reset"
-              onPress={() => console.log("press")}
+              onPress={() => gitSumUsers()}
             />
             <PressableButton
               type="primary"
               label="Confirm"
-              onPress={handleSubmit(onSubmit, onError)}
+              onPress={handleSubmit(onSubmit)}
             />
           </View>
         </ScrollView>

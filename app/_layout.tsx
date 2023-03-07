@@ -4,6 +4,8 @@ import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
+import { SupabaseClientProvider } from "./shared/supabase.provider";
+import client from "../supabase";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -37,12 +39,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { colorScheme } = useColorScheme();
   return (
-    <>
+    <SupabaseClientProvider client={client}>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
       </Stack>
-    </>
+    </SupabaseClientProvider>
   );
 }

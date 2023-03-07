@@ -3,6 +3,10 @@
     "name": "fit-genius",
     "slug": "fit-genius",
     "version": "1.0.0",
+    "extra": {
+      "supabaseUrl": "https://rqavyroelmtspuxnybsz.supabase.co",
+      "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxYXZ5cm9lbG10c3B1eG55YnN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njg4NjE5NTYsImV4cCI6MTk4NDQzNzk1Nn0.4puOFfKWoDR8ZsN8A895UvSB9tnp4NQHOwq0gP9DQCg"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "fit-genius",
@@ -14,7 +18,8 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "ogm.fitgenius"
     },
     "android": {
       "adaptiveIcon": {
