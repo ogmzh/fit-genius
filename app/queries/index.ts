@@ -1,23 +1,17 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { formatISO } from 'date-fns';
 
-import { useSupabase } from "../shared/supabase.provider";
-import {
-  Client,
-  ClientRow,
-  DatabaseTables,
-} from "../shared/types/database";
-import { UserSchemaFormValues } from "../(tabs)/users/user-form";
-import { formatISO } from "date-fns";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { UserSchemaFormValues } from '../(tabs)/users/user-form';
+import HttpStatusCode from '../shared/http-status-codes';
+import { useSupabase } from '../shared/supabase.provider';
+import { Client, ClientRow, DatabaseTables } from '../shared/types/database';
 
 export const QUERY_KEYS = {
   clients: "clients",
 } as const;
 
-export const useClientsData = () => {
+export const useUsersData = () => {
   const { client } = useSupabase();
   const clientQuery = client
     ?.from<DatabaseTables.CLIENTS, Client>(DatabaseTables.CLIENTS)
@@ -44,12 +38,36 @@ export const useClientsData = () => {
   return { data, isLoading };
 };
 
-export const useMutateClientData = () => {
+export const useMutateUsers = () => {
   const { client } = useSupabase();
 
   const queryClient = useQueryClient();
 
-  const userMutation = useMutation(
+  const deleteMutation = useMutation(
+    async (id: string) => {
+      const response = await client
+        ?.from<DatabaseTables.CLIENTS, Client>(DatabaseTables.CLIENTS)
+        .delete()
+        .eq("id", id);
+      return {
+        status: response?.status,
+        statusText: response?.statusText,
+        error: response?.error,
+      };
+    },
+    {
+      onSuccess: data => {
+        console.log("what is ddaatataaa", data)
+        if (data.status === HttpStatusCode.NO_CONTENT) {
+          console.log("invalidate all clients")
+          return queryClient.invalidateQueries([QUERY_KEYS.clients]);
+        }
+      },
+    }
+  );
+
+  const createMutation = useMutation(
+    [QUERY_KEYS.clients],
     async (data: UserSchemaFormValues) => {
       const response = await client
         ?.from<DatabaseTables.CLIENTS, Client>(DatabaseTables.CLIENTS)
@@ -79,13 +97,21 @@ export const useMutateClientData = () => {
       };
     },
     {
-      onSuccess: () => queryClient.invalidateQueries([QUERY_KEYS.clients]),
+      onSuccess: data => {
+        if (data.status === HttpStatusCode.CREATED) {
+          return queryClient.invalidateQueries([QUERY_KEYS.clients]);
+        }
+      },
     }
   );
   return {
-    mutate: userMutation.mutate,
-    mutateAsync: userMutation.mutateAsync,
-    isLoading: userMutation.isLoading,
-    isSuccess: userMutation.isSuccess,
+    create: createMutation.mutate,
+    createAsync: createMutation.mutateAsync,
+    isLoadingCreate: createMutation.isLoading,
+    isSuccessCreate: createMutation.isSuccess,
+    delete: deleteMutation.mutate,
+    deleteAsync: deleteMutation.mutateAsync,
+    isLoadingDelete: deleteMutation.isLoading,
+    isSuccessDelete: deleteMutation.isSuccess,
   };
 };

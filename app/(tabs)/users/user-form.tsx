@@ -11,7 +11,7 @@ import TextFormInput from "../../components/text-form-input";
 import { DATE_FORMAT } from "../../shared/utils";
 import PressableButton from "../../components/pressable-button";
 import { useNavigation } from "expo-router";
-import { useMutateClientData } from "../../queries";
+import { useMutateUsers } from "../../queries";
 
 const userSchema = z.object({
   firstName: z
@@ -62,7 +62,7 @@ export default function ClientFormScreen() {
 
   const { canGoBack, goBack } = useNavigation();
 
-  const { mutateAsync, isLoading } = useMutateClientData();
+  const { createAsync, isLoadingCreate: isLoading } = useMutateUsers();
 
   const { ...methods } = useForm<UserSchemaFormValues>({
     resolver: zodResolver(userSchema),
@@ -87,7 +87,7 @@ export default function ClientFormScreen() {
   };
 
   const onSubmit: SubmitHandler<UserSchemaFormValues> = async data => {
-    const response = await mutateAsync(data);
+    const response = await createAsync(data);
 
     if (response.status !== HttpStatusCode.CREATED) {
       console.warn(response.error?.message);
