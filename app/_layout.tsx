@@ -6,6 +6,16 @@ import { useColorScheme } from "nativewind";
 import { useEffect } from "react";
 import { SupabaseClientProvider } from "./shared/supabase.provider";
 import client from "../supabase";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: true,
+      staleTime: 1,
+    },
+  },
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -40,11 +50,15 @@ function RootLayoutNav() {
   const { colorScheme } = useColorScheme();
   return (
     <SupabaseClientProvider client={client}>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
-      </Stack>
+      <QueryClientProvider client={queryClient}>
+        <>
+          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
+          </Stack>
+        </>
+      </QueryClientProvider>
     </SupabaseClientProvider>
   );
 }

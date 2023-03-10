@@ -36,7 +36,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="users"
         options={{
-          title: "Users",
+          title: "Clients",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons color={color} name="people-sharp" size={24} />
           ),

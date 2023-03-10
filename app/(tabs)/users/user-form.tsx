@@ -1,23 +1,17 @@
-import { format, formatISO } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
-import {
-  FormProvider,
-  SubmitErrorHandler,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { z } from "zod";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import PressableButton from "../components/pressable-button";
-import TextFormInput from "../components/text-form-input";
-import HttpStatusCode from "../shared/http-status-codes";
-import { useSupabase } from "../shared/supabase.provider";
-import DatabaseTables from "../shared/types/db";
-import { DATE_FORMAT } from "../shared/utils";
+import HttpStatusCode from "../../shared/http-status-codes";
+import TextFormInput from "../../components/text-form-input";
+import { DATE_FORMAT } from "../../shared/utils";
+import PressableButton from "../../components/pressable-button";
+import { useNavigation } from "expo-router";
+import { useMutateClientData } from "../../queries";
 
 const userSchema = z.object({
   firstName: z
@@ -61,19 +55,21 @@ const userSchema = z.object({
   notes: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof userSchema>;
+export type UserSchemaFormValues = z.infer<typeof userSchema>;
 
-export default function TabOneScreen() {
+export default function ClientFormScreen() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const { queryBuilder, client } = useSupabase();
+  const { canGoBack, goBack } = useNavigation();
 
-  const { ...methods } = useForm<FormValues>({
+  const { mutateAsync, isLoading } = useMutateClientData();
+
+  const { ...methods } = useForm<UserSchemaFormValues>({
     resolver: zodResolver(userSchema),
     reValidateMode: "onSubmit",
   });
 
-  const { watch, setValue, handleSubmit, setError } = methods;
+  const { watch, setValue, handleSubmit, setError, reset } = methods;
 
   const date = watch("dateOfBirth");
 
@@ -87,68 +83,42 @@ export default function TabOneScreen() {
 
   const handleConfirmDate = (date: Date) => {
     setValue("dateOfBirth", date);
-
     hideDatePicker();
   };
 
-  const onSubmit: SubmitHandler<FormValues> = async data => {
-    if (queryBuilder) {
-      const response = await queryBuilder(DatabaseTables.CLIENTS).insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email || null,
-        phone_number: data.phoneNumber || null,
-        height:
-          data.height && typeof data.height === "number"
-            ? Number(data.height)
-            : null,
-        weight:
-          data.weight && typeof data.weight === "number"
-            ? Number(data.weight)
-            : null,
-        date_of_birth: data.dateOfBirth
-          ? formatISO(data.dateOfBirth)
-          : null,
-        goals: data.goals || null,
-        notes: data.notes || null,
-      });
-      if (response.status !== HttpStatusCode.CREATED) {
-        console.warn(response.error?.message);
-      }
-      if (response?.error) {
-        if (response.status === HttpStatusCode.CONFLICT) {
-          console.log("hello error", response.error);
-          if (response.error.message.includes("email_key")) {
-            setError(
-              "email",
-              {
-                message: "Email already exists",
-              },
-              { shouldFocus: true }
-            );
-          }
-          if (response.error.message.includes("phone_number_key")) {
-            setError(
-              "phoneNumber",
-              {
-                message: "Phone already exists",
-              },
-              { shouldFocus: true }
-            );
-          }
+  const onSubmit: SubmitHandler<UserSchemaFormValues> = async data => {
+    const response = await mutateAsync(data);
+
+    if (response.status !== HttpStatusCode.CREATED) {
+      console.warn(response.error?.message);
+    }
+
+    if (response?.error) {
+      if (response.status === HttpStatusCode.CONFLICT) {
+        if (response.error.message.includes("email_key")) {
+          setError(
+            "email",
+            {
+              message: "Email already exists",
+            },
+            { shouldFocus: true }
+          );
+        }
+        if (response.error.message.includes("phone_number_key")) {
+          setError(
+            "phoneNumber",
+            {
+              message: "Phone already exists",
+            },
+            { shouldFocus: true }
+          );
         }
       }
+    } else {
+      reset();
+      canGoBack() && goBack();
     }
   };
-
-  async function gitSumUsers() {
-    if (client) {
-      const resp = await client
-        .from("clients")
-        .select("*", { count: "exact" });
-      console.log("response", resp.count);
-    }
-  }
 
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-primary-light dark:bg-primary-dark">
@@ -224,11 +194,13 @@ export default function TabOneScreen() {
           </View>
           <View className="flex flex-row justify-around">
             <PressableButton
+              disabled={isLoading}
               type="secondary"
               label="Reset"
-              onPress={() => gitSumUsers()}
+              onPress={() => reset()}
             />
             <PressableButton
+              disabled={isLoading}
               type="primary"
               label="Confirm"
               onPress={handleSubmit(onSubmit)}

@@ -1,14 +1,14 @@
+import { isFuture } from "date-fns";
+import { createContext, useContext, useState } from "react";
+
 import {
   AuthError,
   AuthResponse,
   Session,
   SupabaseClient,
 } from "@supabase/supabase-js";
-import { PostgrestQueryBuilder } from "@supabase/postgrest-js";
-import { isFuture } from "date-fns";
-import { createContext, useContext, useEffect, useState } from "react";
-import DatabaseTables, { DatabaseTableEnum } from "./types/db";
-import { Database } from "./types/supabase";
+
+import { Database } from "./types/generated";
 
 export const SupabaseClientContext = createContext<{
   session: Session | null;
@@ -19,9 +19,6 @@ export const SupabaseClientContext = createContext<{
     access: string,
     refresh: string
   ) => Promise<AuthResponse>;
-  queryBuilder: (
-    table: DatabaseTableEnum
-  ) => PostgrestQueryBuilder<any, any>;
 } | null>(null);
 
 type ClientProviderProps = {
@@ -33,7 +30,6 @@ export const SupabaseClientProvider = ({
   client,
   children,
 }: ClientProviderProps) => {
-  DatabaseTables;
   const [session, setSession] = useState<Session | null>(null);
   const [sessionError, setSessionError] = useState<AuthError | null>(null);
 
@@ -61,7 +57,6 @@ export const SupabaseClientProvider = ({
         client,
         isAuthenticated: isValidExpiry(session),
         sessionError,
-        queryBuilder: (table: DatabaseTableEnum) => client.from(table),
         setAuthSession,
       }}>
       {children}
@@ -77,7 +72,6 @@ export function useSupabase() {
     sessionError: context?.sessionError,
     isAuthenticated: context?.session?.user !== null,
     setAuthSession: context?.setAuthSession,
-    queryBuilder: context?.queryBuilder,
     client: context?.client,
   };
 }
