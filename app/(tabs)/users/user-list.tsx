@@ -8,10 +8,13 @@ import {
 
 import { FloatingActionButton } from "../../components/floating-action-button";
 import { UserCard } from "../../components/user-card";
-import { useUsersData } from "../../queries";
+import { QUERY_KEYS, useUsersData } from "../../queries";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function UserList() {
-  const { data, isLoading } = useUsersData();
+  const { data, isLoading, isStale } = useUsersData();
+
+  const queryClient = useQueryClient();
 
   const { push } = useRouter();
   return (
@@ -26,12 +29,21 @@ export default function UserList() {
         renderItem={({ item }) => (
           <UserCard
             user={item}
-            onPress={() => console.log("pressed user", item)}
+            onPress={() => {
+              // preload query data if it's not stale
+              // so we don't have to unnecessarily (p)refetch
+              !isStale &&
+                queryClient.setQueryData(
+                  [QUERY_KEYS.clients, item.id],
+                  item
+                );
+              push(`users/${item.id}`);
+            }}
           />
         )}
         keyExtractor={item => item.id}
       />
-      <FloatingActionButton onPress={() => push("/users/user-form")} />
+      <FloatingActionButton onPress={() => push("users")} />
     </SafeAreaView>
   );
 }

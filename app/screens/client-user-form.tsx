@@ -1,71 +1,40 @@
 import { format } from "date-fns";
-import { useState } from "react";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import DatePicker from "react-native-date-picker";
-import { z } from "zod";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import HttpStatusCode from "../../shared/http-status-codes";
-import TextFormInput from "../../components/text-form-input";
-import { DATE_FORMAT } from "../../shared/utils";
-import PressableButton from "../../components/pressable-button";
-import { useNavigation } from "expo-router";
-import { useMutateUsers } from "../../queries";
 
-const userSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, "Name is required")
-    .max(50, "Name is too long"),
-  lastName: z
-    .string()
-    .min(2, "Name is required")
-    .max(50, "Name is too long"),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
-  phoneNumber: z
-    .string()
-    .min(6, "Phone number is too short")
-    .optional()
-    .or(z.literal("")),
-  height: z
-    .number({
-      coerce: true,
-      errorMap: () => ({
-        message: "Invalid number format",
-      }),
-    })
-    .min(100, "Too low value")
-    .max(250, "Too high value")
-    .optional()
-    .or(z.literal("")),
-  weight: z
-    .number({
-      coerce: true,
-      errorMap: () => ({
-        message: "Invalid number format",
-      }),
-    })
-    .min(20, "Too low value")
-    .max(500, "Too high value")
-    .optional()
-    .or(z.literal("")),
-  dateOfBirth: z.date().optional(),
-  goals: z.string().optional().nullable(),
-  notes: z.string().optional(),
-});
+import PressableButton from "../components/pressable-button";
+import TextFormInput from "../components/text-form-input";
+import { useMutateUsers, useUser } from "../queries";
+import HttpStatusCode from "../shared/http-status-codes";
+import { DATE_FORMAT, mapClientRowToFormObject } from "../shared/utils";
+import {
+  ClientUserSchema,
+  clientUserSchema,
+} from "../shared/validation/client";
 
-export type UserSchemaFormValues = z.infer<typeof userSchema>;
-
-export default function ClientFormScreen() {
+export default function ClientUserFormScreen() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const { canGoBack, goBack } = useNavigation();
 
-  const { createAsync, isLoadingCreate: isLoading } = useMutateUsers();
+  // represents the [user] (actually, id) matched in the file name
+  const { user: id } = useLocalSearchParams<{ user: string }>();
 
-  const { ...methods } = useForm<UserSchemaFormValues>({
-    resolver: zodResolver(userSchema),
+  const { data: existingUser } = useUser(id);
+  console.log("existingUser", existingUser, id);
+  const { createAsync, updateAsync, isLoadingUpdate, isLoadingCreate } =
+    useMutateUsers();
+
+  const isEditing = !!id && !!existingUser;
+
+  const { ...methods } = useForm<ClientUserSchema>({
+    resolver: zodResolver(clientUserSchema),
+    defaultValues: isEditing && existingUser ? { ...existingUser } : {},
     reValidateMode: "onSubmit",
   });
 
@@ -86,8 +55,10 @@ export default function ClientFormScreen() {
     hideDatePicker();
   };
 
-  const onSubmit: SubmitHandler<UserSchemaFormValues> = async data => {
-    const response = await createAsync(data);
+  const onSubmit: SubmitHandler<ClientUserSchema> = async data => {
+    const response = isEditing
+      ? await updateAsync({ data, id })
+      : await createAsync(data);
 
     if (response.status !== HttpStatusCode.CREATED) {
       console.warn(response.error?.message);
@@ -194,13 +165,13 @@ export default function ClientFormScreen() {
           </View>
           <View className="flex flex-row justify-around">
             <PressableButton
-              disabled={isLoading}
+              disabled={isLoadingCreate || isLoadingUpdate}
               type="secondary"
               label="Reset"
               onPress={() => reset()}
             />
             <PressableButton
-              disabled={isLoading}
+              disabled={isLoadingCreate || isLoadingUpdate}
               type="primary"
               label="Confirm"
               onPress={handleSubmit(onSubmit)}

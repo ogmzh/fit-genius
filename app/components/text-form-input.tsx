@@ -43,7 +43,7 @@ const TextFormInput = ({
         dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder={placeholder}
         onBlur={field.onBlur}
-        value={field.value}
+        value={field.value.toString()} // we can receive numerical values
         onChangeText={field.onChange}
         ref={field.ref}
         multiline={Boolean(numberOfLines && numberOfLines > 1)}

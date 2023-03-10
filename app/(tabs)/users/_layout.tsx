@@ -9,7 +9,9 @@ export default function UsersLayout() {
         headerTitle: "Clients",
       }}>
       <Stack.Screen name="user-list" />
-      <Stack.Screen name="user-form" />
+      {/* dynamic route, i.e. /users/abcd-123 */}
+      <Stack.Screen name="[user]" />
+      <Stack.Screen name="index" />
     </Stack>
   );
 }
