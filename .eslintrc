@@ -1,0 +1,22 @@
+{
+  "env": {
+    "es2022": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["unicorn", "@typescript-eslint", "unused-imports"],
+  "extends": [
+    "plugin:unicorn/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "rules": {
+    "unicorn/no-array-reduce": "warn",
+    "react-hooks/exhaustive-deps": "off",
+    "unused-imports/no-unused-imports": "warn"
+  }
+}
