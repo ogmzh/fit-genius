@@ -8,15 +8,43 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["unicorn", "@typescript-eslint", "unused-imports"],
+  "plugins": [
+    "unicorn",
+    "@typescript-eslint",
+    "unused-imports",
+    "react-hooks"
+  ],
   "extends": [
     "plugin:unicorn/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended"
   ],
   "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "no-console": "warn",
     "unicorn/no-array-reduce": "warn",
     "react-hooks/exhaustive-deps": "off",
-    "unused-imports/no-unused-imports": "warn"
+    "unused-imports/no-unused-imports": "warn",
+    "react/react-in-jsx-scope": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prevent-abbreviations": [
+      "error",
+      {
+        "replacements": {
+          "props": {
+            "properties": false
+          },
+          "i": {
+            "index": false
+          },
+          "ref": {
+            "reference": false
+          },
+          "params": {
+            "parameters": false
+          }
+        }
+      }
+    ]
   }
 }

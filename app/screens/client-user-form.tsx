@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import DatePicker from "react-native-date-picker";
@@ -11,7 +11,7 @@ import PressableButton from "../components/pressable-button";
 import TextFormInput from "../components/text-form-input";
 import { useMutateUsers, useUser } from "../queries";
 import HttpStatusCode from "../shared/http-status-codes";
-import { DATE_FORMAT, mapClientRowToFormObject } from "../shared/utils";
+import { DATE_FORMAT } from "../shared/utils";
 import {
   ClientUserSchema,
   clientUserSchema,
