@@ -1,50 +1,95 @@
 import { SafeAreaView, Text, View } from "react-native";
-import { Calendar, Mode } from "react-native-big-calendar";
 import DropDownPicker from "react-native-dropdown-picker";
-import { useState } from "react";
+import { memo, useState } from "react";
+import {
+  Calendar,
+  CalendarList,
+  Agenda,
+  Timeline,
+  AgendaEntry,
+} from "react-native-calendars";
 
-const events = [
-  {
-    title: "Meeting",
-    start: new Date(2020, 1, 11, 10, 0),
-    end: new Date(2020, 1, 11, 10, 30),
-  },
-  {
-    title: "Coffee break",
-    start: new Date(2020, 1, 11, 15, 45),
-    end: new Date(2020, 1, 11, 16, 30),
-  },
-];
+const events = {
+  "2023-03-12": [
+    { name: "Meeting with client", height: 60, day: "10:00-11:00" },
+    { name: "Lunch with team", height: 60, day: "10:00-11:00" },
+    { name: "Workout", height: 60, day: "12:00-13:00" },
+  ],
+  "2023-03-15": [
+    { name: "Project deadline", height: 60, day: "2023-03-15" },
+  ],
+  "2023-03-20": [
+    {
+      name: "Presentation with investors",
+      height: 60,
+      day: "2023-03-20",
+    },
+  ],
+};
 
-const modes: { value: Mode; label: string }[] = [
-  { label: "3 days", value: "3days" },
-  { label: "Week", value: "week" },
-  { label: "Month", value: "month" },
-  { label: "Day", value: "day" },
-];
-
+const vacation = {
+  key: "vacation",
+  color: "red",
+  selectedDotColor: "blue",
+};
+const massage = {
+  key: "massage",
+  color: "blue",
+  selectedDotColor: "blue",
+};
+const workout = { key: "workout", color: "green" };
 const ScheduleScreen = () => {
-  const [mode, setMode] = useState<Mode>("day");
-
-  const [open, setOpen] = useState(false);
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-slate-100">
-      <View className="flex flex-1 px-2 items-center w-max">
-        <View className="flex items-center bg-red-200 flex-row z-10 px-10">
-          <Text className="mr-2">Mode</Text>
-          <DropDownPicker
-            open={open}
-            value={mode}
-            items={modes}
-            setOpen={setOpen}
-            setValue={setMode}
-          />
-        </View>
-        <Calendar events={events} height={100} mode={mode} />
-        <Text>bye</Text>
-      </View>
+      <Agenda
+        items={events}
+        markingType="multi-dot"
+        markedDates={{
+          "2023-03-12": {
+            dots: [vacation, massage, workout],
+            selected: true,
+          },
+        }}
+        showClosingKnob
+        renderList={items => {
+          return (
+            <MyTimeline
+              entries={items.items?.["2023-03-12"]}
+              day="2023-03-12"
+            />
+          );
+        }}
+      />
     </SafeAreaView>
   );
 };
+
+const MyTimeline = memo(
+  ({ entries, day }: { entries?: AgendaEntry[]; day: string }) => {
+    console.log("renderin an entry", entries);
+    return (
+      <Timeline
+        showNowIndicator
+        date={day}
+        scrollToNow
+        events={
+          entries?.map(entry => ({
+            start: `${day} ${entry?.day.split("-")[0]}`,
+            end: `${day} ${entry?.day.split("-")[1]}`,
+            title: entry?.name ?? "wut",
+          })) ?? []
+          // [
+          // {
+          //   start: "2023-03-12 10:00",
+          //   end: "2023-03-12 11:00",
+          //   title: entry?.name ?? "wut",
+          // },
+          // ]
+        }
+      />
+    );
+  },
+  (previous, next) => previous.entry?.name === next.entry?.name
+);
 
 export default ScheduleScreen;
