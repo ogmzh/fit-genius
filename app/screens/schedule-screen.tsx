@@ -1,95 +1,110 @@
-import { SafeAreaView, Text, View } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
-import { memo, useState } from "react";
+import { format } from "date-fns";
+import { useMemo, useState } from "react";
+import { SafeAreaView } from "react-native";
+import { Agenda, AgendaEntry, Timeline } from "react-native-calendars";
 import {
-  Calendar,
-  CalendarList,
-  Agenda,
-  Timeline,
-  AgendaEntry,
-} from "react-native-calendars";
+  AgendaSchedule,
+  MarkedDates,
+} from "react-native-calendars/src/types";
+import { FloatingActionButton } from "../components/floating-action-button";
 
-const events = {
+const events: AgendaSchedule = {
   "2023-03-12": [
-    { name: "Meeting with client", height: 60, day: "10:00-11:00" },
-    { name: "Lunch with team", height: 60, day: "10:00-11:00" },
+    {
+      name: "Ognjen Mišić, Milan Šušnjar, Marko Bajić, Mirko Bajić",
+      height: 120,
+      day: "10:00-11:00",
+    },
+    { name: "Lunch with team", height: 60, day: "11:00-12:30" },
     { name: "Workout", height: 60, day: "12:00-13:00" },
   ],
   "2023-03-15": [
-    { name: "Project deadline", height: 60, day: "2023-03-15" },
+    { name: "Project deadline", height: 60, day: "12:00-13:00" },
   ],
-  "2023-03-20": [
+  "2023-03-17": [
     {
       name: "Presentation with investors",
       height: 60,
-      day: "2023-03-20",
+      day: "15:00-16:00",
     },
   ],
 };
 
-const vacation = {
-  key: "vacation",
-  color: "red",
-  selectedDotColor: "blue",
-};
-const massage = {
-  key: "massage",
-  color: "blue",
-  selectedDotColor: "blue",
-};
-const workout = { key: "workout", color: "green" };
+const randomColor = () =>
+  Math.floor(Math.random() * 16_777_215).toString(16);
+
+const today = format(new Date(), "yyyy-MM-dd");
+
 const ScheduleScreen = () => {
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  const markedDates: MarkedDates = useMemo(
+    () =>
+      Object.keys(events).reduce((accumulator, key) => {
+        return {
+          ...accumulator,
+          [key]: {
+            dots: events[key].map(event => ({
+              key: event.name,
+              color: `#${randomColor()}`,
+            })),
+          },
+        };
+      }, {}),
+    []
+  );
+
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-slate-100">
       <Agenda
         items={events}
         markingType="multi-dot"
-        markedDates={{
-          "2023-03-12": {
-            dots: [vacation, massage, workout],
-            selected: true,
-          },
-        }}
+        selected={selectedDate}
+        markedDates={markedDates}
+        onDayPress={day => setSelectedDate(day.dateString)}
         showClosingKnob
         renderList={items => {
           return (
             <MyTimeline
-              entries={items.items?.["2023-03-12"]}
-              day="2023-03-12"
+              entries={items.items?.[selectedDate]}
+              day={selectedDate}
             />
           );
         }}
       />
+      <FloatingActionButton onPress={() => console.log("hi")} />
     </SafeAreaView>
   );
 };
 
-const MyTimeline = memo(
-  ({ entries, day }: { entries?: AgendaEntry[]; day: string }) => {
-    console.log("renderin an entry", entries);
-    return (
-      <Timeline
-        showNowIndicator
-        date={day}
-        scrollToNow
-        events={
-          entries?.map(entry => ({
-            start: `${day} ${entry?.day.split("-")[0]}`,
-            end: `${day} ${entry?.day.split("-")[1]}`,
-            title: entry?.name ?? "wut",
-          })) ?? []
-          // [
-          // {
-          //   start: "2023-03-12 10:00",
-          //   end: "2023-03-12 11:00",
-          //   title: entry?.name ?? "wut",
-          // },
-          // ]
-        }
-      />
-    );
-  },
-  (previous, next) => previous.entry?.name === next.entry?.name
-);
+const MyTimeline = ({
+  entries,
+  day,
+}: {
+  entries?: AgendaEntry[];
+  day: string;
+}) => {
+  return (
+    <Timeline
+      showNowIndicator
+      date={day}
+      timelineLeftInset={60}
+      scrollToNow={true}
+      onBackgroundLongPress={day =>
+        console.log("background long press", day)
+      }
+      onEventPress={event => console.log("event press", event)}
+      events={
+        entries?.map(entry => ({
+          start: `${day} ${entry?.day.split("-")[0]}`,
+          end: `${day} ${entry?.day.split("-")[1]}`,
+          title: entry?.name ?? "wut",
+          summary:
+            "well hello there\ngeneral kenobi\nognjen mišić\nkako si",
+        })) ?? []
+      }
+    />
+  );
+};
 
 export default ScheduleScreen;

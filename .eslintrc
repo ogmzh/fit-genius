@@ -22,12 +22,12 @@
   "rules": {
     "@typescript-eslint/no-unused-vars": ["warn"],
     "no-console": "warn",
-    "unicorn/no-array-reduce": "warn",
     "react-hooks/exhaustive-deps": "off",
     "unused-imports/no-unused-imports": "warn",
     "react/react-in-jsx-scope": "off",
     "unicorn/no-null": "off",
     "react/display-name": "off",
+    "unicorn/no-array-reduce": "off",
     "unicorn/prevent-abbreviations": [
       "error",
       {
