@@ -3,7 +3,9 @@ import { formatISO } from "date-fns";
 import { ClientRow } from "./types/database";
 import { ClientUserSchema } from "./validation/client";
 
-export const DATE_FORMAT = "MMM dd. yyyy";
+export const HUMAN_DATE_FORMAT = "MMM dd. yyyy";
+export const SQL_DATE_FORMAT = "yyyy-MM-dd";
+export const TIME_FORMAT = "HH:mm";
 
 export const mapClientRowToFormObject = (
   row: ClientRow

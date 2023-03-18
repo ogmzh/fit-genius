@@ -9,6 +9,49 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          client_ids: string[] | null
+          created_at: string | null
+          day: string
+          from: string
+          id: string
+          to: string
+        }
+        Insert: {
+          client_ids?: string[] | null
+          created_at?: string | null
+          day: string
+          from: string
+          id?: string
+          to: string
+        }
+        Update: {
+          client_ids?: string[] | null
+          created_at?: string | null
+          day?: string
+          from?: string
+          id?: string
+          to?: string
+        }
+      }
+      client_appointments: {
+        Row: {
+          appointment_id: string
+          client_id: string
+          id: string
+        }
+        Insert: {
+          appointment_id: string
+          client_id: string
+          id?: string
+        }
+        Update: {
+          appointment_id?: string
+          client_id?: string
+          id?: string
+        }
+      }
       clients: {
         Row: {
           created_at: string

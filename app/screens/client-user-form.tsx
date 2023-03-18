@@ -9,9 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import PressableButton from "../components/pressable-button";
 import TextFormInput from "../components/text-form-input";
-import { useMutateUsers, useUser } from "../queries";
+import { useMutateUsers, useUser } from "../queries/clients";
 import HttpStatusCode from "../shared/http-status-codes";
-import { DATE_FORMAT } from "../shared/utils";
+import { HUMAN_DATE_FORMAT } from "../shared/utils";
 import {
   ClientUserSchema,
   clientUserSchema,
@@ -141,7 +141,7 @@ export default function ClientUserFormScreen() {
               className={`bg-slate-50 border border-slate-300 ${
                 date ? "text-gray-900" : "text-gray-400"
               } text-sm rounded-lg w-full py-3.5 px-2.5`}>
-              {date ? format(date, DATE_FORMAT) : "DD/MM/YYYY"}
+              {date ? format(date, HUMAN_DATE_FORMAT) : "DD/MM/YYYY"}
             </Text>
             <DatePicker
               modal

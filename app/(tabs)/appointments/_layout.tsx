@@ -8,6 +8,7 @@ export default function AppointmentStack() {
         headerTitle: "Appointments",
       }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="new" />
       <Stack.Screen name="details" />
     </Stack>
   );

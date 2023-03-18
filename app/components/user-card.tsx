@@ -2,7 +2,7 @@ import { Alert, Pressable, Text, View } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 
-import { useMutateUsers } from "../queries";
+import { useMutateUsers } from "../queries/clients";
 import { ClientUser } from "../shared/types/entities";
 
 export const UserCard = ({
@@ -17,7 +17,7 @@ export const UserCard = ({
   return (
     <Pressable
       className="flex flex-row justify-between rounded-md border-2
-     border-slate-200 bg-primary-light py-5 my-2 mx-2 px-4 items-center"
+     border-slate-50 bg-primary-light py-5 my-2 mx-2 px-4 items-center"
       onPress={onPress}>
       <View className="flex h-8 justify-center">
         <View className="flex flex-row ">

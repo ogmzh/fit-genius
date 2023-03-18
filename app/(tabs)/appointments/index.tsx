@@ -1,5 +1,5 @@
-import NewAppointmentScreen from "../../screens/new-appointment";
+import ScheduleScreen from "../../screens/schedule-screen";
 
-const NewAppointment = () => <NewAppointmentScreen />;
+const Index = () => <ScheduleScreen />;
 
-export default NewAppointment;
+export default Index;

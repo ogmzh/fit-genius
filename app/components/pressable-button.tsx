@@ -10,14 +10,19 @@ type Props = {
   disabled?: boolean;
 };
 
-const enabledStyles = (type: ButtonType) =>
-  `${
-    type === "primary"
-      ? "bg-primary-accent active:bg-primary-accentDark"
-      : type === "secondary"
-      ? "bg-primary-paperLight active:bg-primary-paper"
-      : "bg-slate-400 active:bg-slate-500"
-  }`;
+const enabledStyles = (type: ButtonType) => {
+  switch (type) {
+    case "primary": {
+      return "bg-primary-accent active:bg-primary-accentDark";
+    }
+    case "secondary": {
+      return "bg-primary-paperLight active:bg-primary-paper";
+    }
+    default: {
+      return "bg-slate-400 active:bg-slate-500";
+    }
+  }
+};
 
 const PressableButton = ({
   label,

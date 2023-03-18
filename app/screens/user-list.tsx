@@ -6,11 +6,12 @@ import {
   View,
 } from "react-native";
 
-import { QUERY_KEYS, useUsersData } from "../queries";
-import { UserCard } from "../components/user-card";
-import { FloatingActionButton } from "../components/floating-action-button";
-
 import { useQueryClient } from "@tanstack/react-query";
+
+import { FloatingActionButton } from "../components/floating-action-button";
+import { UserCard } from "../components/user-card";
+import { QUERY_KEYS } from "../queries";
+import { useUsersData } from "../queries/clients";
 
 export default function UserListScreen() {
   const { data, isLoading, isStale } = useUsersData();

@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { addHours, format } from "date-fns";
 import { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native";
 import { Agenda, AgendaEntry, Timeline } from "react-native-calendars";
@@ -7,6 +7,8 @@ import {
   MarkedDates,
 } from "react-native-calendars/src/types";
 import { FloatingActionButton } from "../components/floating-action-button";
+import { useRouter } from "expo-router";
+import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
 
 const events: AgendaSchedule = {
   "2023-03-12": [
@@ -35,8 +37,24 @@ const randomColor = () =>
 
 const today = format(new Date(), "yyyy-MM-dd");
 
+const newAppointmentQueryDateString = () => {
+  const now = new Date();
+
+  const nextTimeslot =
+    now.getMinutes() === 0
+      ? now
+      : new Date(addHours(now, 1).setMinutes(0));
+
+  return `date=${format(now, SQL_DATE_FORMAT)}&from=${format(
+    nextTimeslot,
+    TIME_FORMAT
+  )}&to=${format(addHours(nextTimeslot, 1), TIME_FORMAT)}`;
+};
+
 const ScheduleScreen = () => {
   const [selectedDate, setSelectedDate] = useState(today);
+
+  const { push } = useRouter();
 
   const markedDates: MarkedDates = useMemo(
     () =>
@@ -57,6 +75,7 @@ const ScheduleScreen = () => {
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-slate-100">
       <Agenda
+        firstDay={1}
         items={events}
         markingType="multi-dot"
         selected={selectedDate}
@@ -72,7 +91,11 @@ const ScheduleScreen = () => {
           );
         }}
       />
-      <FloatingActionButton onPress={() => console.log("hi")} />
+      <FloatingActionButton
+        onPress={() =>
+          push(`appointments/new?${newAppointmentQueryDateString()}`)
+        }
+      />
     </SafeAreaView>
   );
 };
