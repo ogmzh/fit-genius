@@ -1,4 +1,4 @@
-import UserListScreen from "../../screens/user-list-screen";
+import UserListScreen from "../../screens/user-list";
 
 const UserTab = () => UserListScreen();
 

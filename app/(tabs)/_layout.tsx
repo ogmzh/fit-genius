@@ -8,6 +8,7 @@ export default function TabLayout() {
   return (
     // TODO: add animations to the tabs (inspiration: expo go)
     <Tabs
+      initialRouteName="settings"
       screenOptions={{
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: accent,
@@ -25,9 +26,10 @@ export default function TabLayout() {
         },
       }}>
       <Tabs.Screen
-        name="index"
+        name="appointments"
         options={{
-          title: "Schedule",
+          title: "Appointments",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons color={color} name="calendar" size={24} />
           ),
@@ -50,6 +52,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons color={color} name="settings" size={24} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        // Name of the route to hide.
+        name="index"
+        options={{
+          // This tab will no longer show up in the tab bar.
+          href: null,
         }}
       />
     </Tabs>

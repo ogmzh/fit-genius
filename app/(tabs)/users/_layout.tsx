@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-export default function UsersLayout() {
+export default function UserStack() {
   return (
     <Stack
       initialRouteName="user-list"

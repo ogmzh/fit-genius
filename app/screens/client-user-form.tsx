@@ -26,7 +26,6 @@ export default function ClientUserFormScreen() {
   const { user: id } = useLocalSearchParams<{ user: string }>();
 
   const { data: existingUser } = useUser(id);
-  console.log("existingUser", existingUser, id);
   const { createAsync, updateAsync, isLoadingUpdate, isLoadingCreate } =
     useMutateUsers();
 
@@ -151,7 +150,7 @@ export default function ClientUserFormScreen() {
               cancelText="CANCEL"
               mode="date"
               maximumDate={new Date()}
-              date={date ? date : new Date()}
+              date={date ?? new Date()}
               open={isDatePickerVisible}
               onConfirm={handleConfirmDate}
               onCancel={hideDatePicker}

@@ -1,6 +1,5 @@
-import { Text } from "react-native";
-import ScheduleScreen from "../screens/schedule-screen";
+import { Redirect } from "expo-router";
 
-export default function TabOneScreen() {
-  return <ScheduleScreen />;
+export default function TabsIndex() {
+  return <Redirect href={{ pathname: "/appointments" }} />;
 }
