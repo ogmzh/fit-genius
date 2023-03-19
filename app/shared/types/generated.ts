@@ -98,7 +98,22 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      appointment_clients_by_date: {
+        Args: {
+          start_date: string
+          end_date: string
+        }
+        Returns: {
+          appointment_id: string
+          day: string
+          time_from: string
+          time_to: string
+          client_id: string
+          first_name: string
+          last_name: string
+          email: string
+        }[]
+      }
     }
     Enums: {
       continents:

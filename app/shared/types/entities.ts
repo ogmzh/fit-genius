@@ -5,6 +5,6 @@ export type Appointment = {
   id?: string;
   createdAt?: string;
   day: string;
-  from: string;
-  to: string;
+  from: Date;
+  to: Date;
 };

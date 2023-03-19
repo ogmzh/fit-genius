@@ -1,4 +1,13 @@
-import { addHours, format } from "date-fns";
+import {
+  addHours,
+  addMonths,
+  endOfMonth,
+  format,
+  getHours,
+  setHours,
+  startOfMonth,
+} from "date-fns";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native";
 import { Agenda, AgendaEntry, Timeline } from "react-native-calendars";
@@ -6,8 +15,9 @@ import {
   AgendaSchedule,
   MarkedDates,
 } from "react-native-calendars/src/types";
+
 import { FloatingActionButton } from "../components/floating-action-button";
-import { useRouter } from "expo-router";
+import { useAppointmentsData } from "../queries/appointments";
 import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
 
 const events: AgendaSchedule = {
@@ -35,24 +45,35 @@ const events: AgendaSchedule = {
 const randomColor = () =>
   Math.floor(Math.random() * 16_777_215).toString(16);
 
-const today = format(new Date(), "yyyy-MM-dd");
+const now = new Date();
+const today = format(now, SQL_DATE_FORMAT);
 
-const newAppointmentQueryDateString = () => {
-  const now = new Date();
-
+const newAppointmentQueryDateString = (
+  selectedDay: string,
+  withHours = false
+) => {
+  const selected = withHours
+    ? new Date(selectedDay)
+    : setHours(new Date(selectedDay), getHours(now) + 1);
   const nextTimeslot =
-    now.getMinutes() === 0
-      ? now
-      : new Date(addHours(now, 1).setMinutes(0));
+    selected.getMinutes() === 0
+      ? selected
+      : new Date(selected.setMinutes(0));
 
-  return `date=${format(now, SQL_DATE_FORMAT)}&from=${format(
+  return `date=${format(selected, SQL_DATE_FORMAT)}&from=${format(
     nextTimeslot,
     TIME_FORMAT
   )}&to=${format(addHours(nextTimeslot, 1), TIME_FORMAT)}`;
 };
 
-const ScheduleScreen = () => {
-  const [selectedDate, setSelectedDate] = useState(today);
+const AppointmentScreen = () => {
+  const [selectedDate, setSelectedDate] = useState<string>(today);
+
+  const todayDate = new Date(today);
+  const { data: appointments } = useAppointmentsData(
+    startOfMonth(addMonths(todayDate, -1)),
+    endOfMonth(addMonths(todayDate, 1))
+  );
 
   const { push } = useRouter();
 
@@ -76,7 +97,7 @@ const ScheduleScreen = () => {
     <SafeAreaView className="flex flex-1 py-4 bg-slate-100">
       <Agenda
         firstDay={1}
-        items={events}
+        items={appointments}
         markingType="multi-dot"
         selected={selectedDate}
         markedDates={markedDates}
@@ -93,7 +114,11 @@ const ScheduleScreen = () => {
       />
       <FloatingActionButton
         onPress={() =>
-          push(`appointments/new?${newAppointmentQueryDateString()}`)
+          push(
+            `appointments/new?${newAppointmentQueryDateString(
+              selectedDate
+            )}`
+          )
         }
       />
     </SafeAreaView>
@@ -107,15 +132,19 @@ const MyTimeline = ({
   entries?: AgendaEntry[];
   day: string;
 }) => {
+  const { push } = useRouter();
+
   return (
     <Timeline
       showNowIndicator
       date={day}
       timelineLeftInset={60}
       scrollToNow={true}
-      onBackgroundLongPress={day =>
-        console.log("background long press", day)
-      }
+      onBackgroundLongPress={day => {
+        push(
+          `appointments/new?${newAppointmentQueryDateString(day, true)}`
+        );
+      }}
       onEventPress={event => console.log("event press", event)}
       events={
         entries?.map(entry => ({
@@ -130,4 +159,4 @@ const MyTimeline = ({
   );
 };
 
-export default ScheduleScreen;
+export default AppointmentScreen;

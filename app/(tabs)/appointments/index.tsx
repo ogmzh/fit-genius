@@ -1,5 +1,5 @@
-import ScheduleScreen from "../../screens/schedule-screen";
+import Appointments from "../../screens/appointments";
 
-const Index = () => <ScheduleScreen />;
+const Index = () => <Appointments />;
 
 export default Index;
