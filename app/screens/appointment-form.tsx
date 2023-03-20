@@ -1,5 +1,5 @@
 import { addHours, format } from "date-fns";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -39,6 +39,10 @@ const NewAppointmentScreen = () => {
   );
   const [selectedUsers, setSelectedUsers] = useState<ClientUser[]>([]);
 
+  const { appointment: id } = useLocalSearchParams<{
+    appointment: string;
+  }>();
+
   const { data } = useUsersData();
   const { createAppointmentAsync, isLoading } = useMutateAppointments();
 
@@ -67,6 +71,8 @@ const NewAppointmentScreen = () => {
       setTimeTo(addHours(timeFrom, 1));
     }
   }, [timeFrom]);
+
+  const { canGoBack, goBack } = useNavigation();
 
   const onTimeChange = (
     event: DateTimePickerEvent,
@@ -117,13 +123,14 @@ const NewAppointmentScreen = () => {
   };
 
   const onConfirmPress = async () => {
-    if (timeFrom && timeTo) {
+    if (timeFrom && timeTo && selectedUsers.length > 0) {
       await createAppointmentAsync({
         clientIds: selectedUsers.map(user => user.id!),
         day: format(selectedDate, SQL_DATE_FORMAT),
         from: timeFrom,
         to: timeTo,
       });
+      canGoBack() && goBack();
     }
   };
 

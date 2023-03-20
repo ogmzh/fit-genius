@@ -32,6 +32,9 @@
       "error",
       {
         "replacements": {
+          "acc": {
+            "accumulator": false
+          },
           "props": {
             "properties": false
           },

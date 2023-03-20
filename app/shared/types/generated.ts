@@ -11,7 +11,7 @@ export interface Database {
     Tables: {
       appointments: {
         Row: {
-          client_ids: string[] | null
+          client_id: string
           created_at: string | null
           day: string
           from: string
@@ -19,7 +19,7 @@ export interface Database {
           to: string
         }
         Insert: {
-          client_ids?: string[] | null
+          client_id: string
           created_at?: string | null
           day: string
           from: string
@@ -27,29 +27,12 @@ export interface Database {
           to: string
         }
         Update: {
-          client_ids?: string[] | null
+          client_id?: string
           created_at?: string | null
           day?: string
           from?: string
           id?: string
           to?: string
-        }
-      }
-      client_appointments: {
-        Row: {
-          appointment_id: string
-          client_id: string
-          id: string
-        }
-        Insert: {
-          appointment_id: string
-          client_id: string
-          id?: string
-        }
-        Update: {
-          appointment_id?: string
-          client_id?: string
-          id?: string
         }
       }
       clients: {

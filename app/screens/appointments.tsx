@@ -1,49 +1,16 @@
-import {
-  addHours,
-  addMonths,
-  endOfMonth,
-  format,
-  getHours,
-  setHours,
-  startOfMonth,
-} from "date-fns";
+import { addHours, addWeeks, format, getHours, setHours } from "date-fns";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native";
 import { Agenda, AgendaEntry, Timeline } from "react-native-calendars";
-import {
-  AgendaSchedule,
-  MarkedDates,
-} from "react-native-calendars/src/types";
+import { MarkedDates } from "react-native-calendars/src/types";
 
 import { FloatingActionButton } from "../components/floating-action-button";
 import { useAppointmentsData } from "../queries/appointments";
 import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
 
-const events: AgendaSchedule = {
-  "2023-03-12": [
-    {
-      name: "Ognjen Mišić, Milan Šušnjar, Marko Bajić, Mirko Bajić",
-      height: 120,
-      day: "10:00-11:00",
-    },
-    { name: "Lunch with team", height: 60, day: "11:00-12:30" },
-    { name: "Workout", height: 60, day: "12:00-13:00" },
-  ],
-  "2023-03-15": [
-    { name: "Project deadline", height: 60, day: "12:00-13:00" },
-  ],
-  "2023-03-17": [
-    {
-      name: "Presentation with investors",
-      height: 60,
-      day: "15:00-16:00",
-    },
-  ],
-};
-
 const randomColor = () =>
-  Math.floor(Math.random() * 16_777_215).toString(16);
+  `#${Math.floor(Math.random() * 16_777_215).toString(16)}`;
 
 const now = new Date();
 const today = format(now, SQL_DATE_FORMAT);
@@ -69,29 +36,26 @@ const newAppointmentQueryDateString = (
 const AppointmentScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string>(today);
 
-  const todayDate = new Date(today);
+  const selectedDateObject = new Date(selectedDate);
   const { data: appointments } = useAppointmentsData(
-    startOfMonth(addMonths(todayDate, -1)),
-    endOfMonth(addMonths(todayDate, 1))
+    addWeeks(selectedDateObject, -1),
+    addWeeks(selectedDateObject, 1)
   );
 
   const { push } = useRouter();
 
-  const markedDates: MarkedDates = useMemo(
-    () =>
-      Object.keys(events).reduce((accumulator, key) => {
-        return {
-          ...accumulator,
-          [key]: {
-            dots: events[key].map(event => ({
-              key: event.name,
-              color: `#${randomColor()}`,
-            })),
-          },
-        };
-      }, {}),
-    []
-  );
+  const markedDates: MarkedDates = useMemo(() => {
+    return appointments
+      ? Object.fromEntries(
+          Object.keys(appointments).map(date => [
+            date,
+            {
+              dots: [{ color: randomColor() }],
+            },
+          ])
+        )
+      : {};
+  }, [appointments]);
 
   return (
     <SafeAreaView className="flex flex-1 py-4 bg-slate-100">
@@ -145,14 +109,13 @@ const MyTimeline = ({
           `appointments/new?${newAppointmentQueryDateString(day, true)}`
         );
       }}
-      onEventPress={event => console.log("event press", event)}
+      onEventPress={event => push(`appointments/${event.id}`)}
       events={
         entries?.map(entry => ({
           start: `${day} ${entry?.day.split("-")[0]}`,
           end: `${day} ${entry?.day.split("-")[1]}`,
-          title: entry?.name ?? "wut",
-          summary:
-            "well hello there\ngeneral kenobi\nognjen mišić\nkako si",
+          title: entry?.name ?? "Workout",
+          summary: "Summary placeholder",
         })) ?? []
       }
     />
