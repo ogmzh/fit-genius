@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import DatePicker from "react-native-date-picker";
@@ -16,6 +16,7 @@ import {
   ClientUserSchema,
   clientUserSchema,
 } from "../shared/validation/client";
+import { isEmpty } from "lodash-es";
 
 export default function ClientUserFormScreen() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -26,6 +27,7 @@ export default function ClientUserFormScreen() {
   const { user: id } = useLocalSearchParams<{ user: string }>();
 
   const { data: existingUser } = useUser(id);
+
   const { createAsync, updateAsync, isLoadingUpdate, isLoadingCreate } =
     useMutateUsers();
 
@@ -36,6 +38,12 @@ export default function ClientUserFormScreen() {
     defaultValues: isEditing && existingUser ? { ...existingUser } : {},
     reValidateMode: "onSubmit",
   });
+
+  useEffect(() => {
+    if (id && existingUser && isEmpty(methods.formState.defaultValues)) {
+      methods.reset({ ...existingUser });
+    }
+  }, [id, existingUser]);
 
   const { watch, setValue, handleSubmit, setError, reset } = methods;
 
@@ -59,7 +67,12 @@ export default function ClientUserFormScreen() {
       ? await updateAsync({ data, id })
       : await createAsync(data);
 
-    if (response.status !== HttpStatusCode.CREATED) {
+    if (
+      !(
+        response.status === HttpStatusCode.CREATED ||
+        response.status === HttpStatusCode.NO_CONTENT
+      )
+    ) {
       console.warn(response.error?.message);
     }
 
