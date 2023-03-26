@@ -6,11 +6,14 @@
 
 ## Appointments screen
 
-- [ ] show individual events
+- [x] show individual events
+- [x] refactor the existing form to tamagui
+- [x] change the date of birth picker component
+  - [ ] implement rn datepicker it for iOS as well; use the component approach (https://github.com/react-native-datetimepicker/datetimepicker )
+- [ ] change the query to fetch all the appointments for the month and make it a long lasting query
+- [ ] search users by name on the new appointment screen
 - [ ] update & delete appointments
-- [ ] pressing the event can pop out a modal to change that user's time
-  - [ ] refactor the time picker to be a component
 
 ## UI
 
-- [ ] seriously consider going for RNUI lib | tamagui
+- [x] seriously consider going for RNUI lib | tamagui

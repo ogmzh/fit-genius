@@ -1,12 +1,20 @@
+/* eslint-disable unicorn/prefer-module */
 import { useFonts } from "expo-font";
-import { Ionicons } from "@expo/vector-icons";
 import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "nativewind";
-import { useEffect } from "react";
-import { SupabaseClientProvider } from "./shared/supabase.provider";
-import client from "../supabase";
+import { TamaguiProvider, Theme } from "tamagui";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import client from "../supabase";
+import config from "../tamagui.config";
+import {
+  AppThemeContext,
+  AppThemeContextProvider,
+} from "../shared/providers/app-theme-context-provider";
+import { SupabaseClientProvider } from "../shared/supabase.provider";
+
+export { ErrorBoundary } from "expo-router";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,11 +25,6 @@ const queryClient = new QueryClient({
   },
 });
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
@@ -29,13 +32,18 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    ...Ionicons.font,
+    Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
+    InterBold: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
   });
 
+  if (error) {
+    console.warn("font error:", error);
+  }
+
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  if (!loaded) {
+    return null;
+  }
 
   return (
     <>
@@ -47,18 +55,31 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const { colorScheme } = useColorScheme();
   return (
-    <SupabaseClientProvider client={client}>
-      <QueryClientProvider client={queryClient}>
-        <>
-          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
-          </Stack>
-        </>
-      </QueryClientProvider>
-    </SupabaseClientProvider>
+    <TamaguiProvider config={config}>
+      <AppThemeContextProvider>
+        <AppThemeContext.Consumer>
+          {({ theme }) => (
+            <Theme name={theme}>
+              <SupabaseClientProvider client={client}>
+                <QueryClientProvider client={queryClient}>
+                  <>
+                    <Stack>
+                      <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: false }}
+                      />
+                    </Stack>
+                    <StatusBar
+                      style={theme === "dark" ? "light" : "dark"}
+                    />
+                  </>
+                </QueryClientProvider>
+              </SupabaseClientProvider>
+            </Theme>
+          )}
+        </AppThemeContext.Consumer>
+      </AppThemeContextProvider>
+    </TamaguiProvider>
   );
 }

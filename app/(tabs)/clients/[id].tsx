@@ -1,4 +1,4 @@
-import ClientUserFormScreen from "../../screens/client-user-form";
+import ClientUserFormScreen from "../../../screens/client-user-form";
 
 const ClientUserById = () => <ClientUserFormScreen />;
 

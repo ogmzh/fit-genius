@@ -1,5 +1,7 @@
-import AppointmentFormScreen from "../../screens/appointment-form";
+import AppointmentFormScreen from "../../../screens/appointment-form";
 
-const AppointmentForm = () => <AppointmentFormScreen />;
+const AppointmentForm = () => {
+  return <AppointmentFormScreen />;
+};
 
 export default AppointmentForm;

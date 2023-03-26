@@ -1,5 +1,7 @@
 ## Notes
 
+- UI lib / design system: https://tamagui.dev/docs/intro/installation
+
 ### Generate supabase types
 
 - generate a personal access token from supabase

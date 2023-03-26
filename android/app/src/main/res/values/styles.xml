@@ -23,9 +23,4 @@
   </style>
 
 
-  <!-- https://github.com/henninghall/react-native-date-picker/ -->
-  <style name="DatePickerTheme" parent="DatePickerBaseTheme">
-    <item name="android:colorControlNormal">#0EA5E9</item>
-    <item name="colorAccent">#0EA5E9</item>
-  </style>
 </resources>

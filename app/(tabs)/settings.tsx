@@ -1,23 +1,25 @@
-import { useColorScheme } from "nativewind";
-import { View, Text, Switch } from "react-native";
-import { useTwColors } from "../shared/hooks";
+import { useColorScheme } from "react-native";
+import { Paragraph, Switch, YStack } from "tamagui";
+
+import { useAppTheme } from "../../shared/providers/app-theme-context-provider";
+import ScreenContainer from "../../components/screen-container";
 
 export default function Settings() {
-  const { toggleColorScheme, colorScheme } = useColorScheme();
-  const { accent, accentLight } = useTwColors();
+  const colorScheme = useColorScheme();
+  const { theme, setTheme } = useAppTheme();
   return (
-    <View className="flex-1 items-center justify-center bg-primary-light dark:bg-primary-dark">
-      <Text className="text-lg dark:bg-primary-dark dark:text-primary-light">
-        Dark Mode
-      </Text>
-      <Switch
-        thumbColor={accent}
-        trackColor={{
-          true: accentLight,
-        }}
-        value={colorScheme === "dark"}
-        onValueChange={toggleColorScheme}
-      />
-    </View>
+    <ScreenContainer>
+      <YStack flex={1} jc="center" ai="center">
+        <Paragraph jc="center">device {colorScheme}</Paragraph>
+        <Paragraph jc="center">app state {theme}</Paragraph>
+        <Switch
+          size="$4"
+          bg={theme === "dark" ? "$primary" : "$backgroundSoft"}
+          onCheckedChange={checked => setTheme(checked ? "dark" : "light")}
+          checked={theme === "dark"}>
+          <Switch.Thumb animation="quick" />
+        </Switch>
+      </YStack>
+    </ScreenContainer>
   );
 }

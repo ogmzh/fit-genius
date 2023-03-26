@@ -1,29 +1,27 @@
-import { Ionicons } from "@expo/vector-icons";
+import { CalendarCheck, Users, Settings2 } from "@tamagui/lucide-icons";
 import { Tabs } from "expo-router";
-import { useTwColors } from "../shared/hooks";
+import { useTheme } from "tamagui";
+import { useThemedHeaderProps } from "../../shared/hooks";
 
 export default function TabLayout() {
-  const { accent, backgroundColor, textColor } = useTwColors();
-
+  const { stackHeaderProps } = useThemedHeaderProps();
+  const { accent, background, text } = useTheme();
   return (
     // TODO: add animations to the tabs (inspiration: expo go)
     <Tabs
-      initialRouteName="settings"
+      initialRouteName="appointments"
       screenOptions={{
+        tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: accent,
+        tabBarActiveTintColor: accent.val,
         tabBarStyle: {
-          backgroundColor: backgroundColor,
+          backgroundColor: background.val,
+          borderTopColor: background.val,
         },
         tabBarLabelStyle: {
-          color: textColor,
+          color: text.val,
         },
-        headerStyle: {
-          backgroundColor: backgroundColor,
-        },
-        headerTitleStyle: {
-          color: textColor,
-        },
+        ...stackHeaderProps,
       }}>
       <Tabs.Screen
         name="appointments"
@@ -31,27 +29,23 @@ export default function TabLayout() {
           title: "Appointments",
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons color={color} name="calendar" size={24} />
+            <CalendarCheck size="$2" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="users"
+        name="clients"
         options={{
           title: "Clients",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Ionicons color={color} name="people-sharp" size={24} />
-          ),
+          tabBarIcon: ({ color }) => <Users size="$2" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <Ionicons color={color} name="settings" size={24} />
-          ),
+          tabBarIcon: ({ color }) => <Settings2 size="$2" color={color} />,
         }}
       />
       <Tabs.Screen

@@ -13,7 +13,6 @@ import RNDateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
-import PressableButton from "../components/pressable-button";
 import { useMutateAppointments } from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
 import { ClientUser } from "../shared/types/entities";
@@ -135,65 +134,42 @@ const NewAppointmentScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex flex-1 pt-2 pb-4 bg-slate-100 dark:bg-primary-dark">
-      <View className="flex items-center mb-2">
-        <Pressable
-          className="px-4 py-2 border-2 rounded-md border-primary-accentDark bg-primary-light"
-          onPress={() => setTimeFor("date")}>
-          <Text className="font-semibold text-xl">
-            {format(selectedDate, HUMAN_DATE_FORMAT)}
-          </Text>
+    <SafeAreaView>
+      <View>
+        <Pressable onPress={() => setTimeFor("date")}>
+          <Text>{format(selectedDate, HUMAN_DATE_FORMAT)}</Text>
         </Pressable>
       </View>
-      <View className="flex flex-row justify-center mx-4">
-        <Pressable
-          disabled={isLoading}
-          onPress={() => setTimeFor("from")}
-          className="flex-1 justify-center rounded-md mr-2 p-4 border-2 border-primary-accentDark bg-primary-light">
+      <View>
+        <Pressable disabled={isLoading} onPress={() => setTimeFor("from")}>
           <Text>From</Text>
-          <Text className="font-semibold text-2xl">
-            {timeFrom && format(timeFrom, "HH:mm")}
-          </Text>
+          <Text>{timeFrom && format(timeFrom, "HH:mm")}</Text>
         </Pressable>
-        <Pressable
-          disabled={isLoading}
-          onPress={() => setTimeFor("to")}
-          className="flex-1 justify-center rounded-md mr-2 p-4 border-2 border-primary-accentDark bg-primary-light">
+        <Pressable disabled={isLoading} onPress={() => setTimeFor("to")}>
           <Text>To</Text>
-          <Text className="font-semibold text-2xl">
-            {timeTo && format(timeTo, "HH:mm")}
-          </Text>
+          <Text>{timeTo && format(timeTo, "HH:mm")}</Text>
         </Pressable>
       </View>
       <FlatList
-        className="m-4"
         data={data?.clients}
         renderItem={({ item: user }) => (
-          <Pressable
-            onPress={() => toggleSelectedUser(user)}
-            className={`justify-start my-1 rounded-md mr-2 p-4 border-2 ${
-              selectedUsers.some(
-                selectedUser => selectedUser.id === user.id
-              )
-                ? "border-primary-accent"
-                : "border-slate-50"
-            } bg-primary-light`}>
-            <View className="flex-row">
+          <Pressable onPress={() => toggleSelectedUser(user)}>
+            <View>
               <Text>{user.firstName}</Text>
-              <Text className="ml-1">{user.lastName}</Text>
+              <Text>{user.lastName}</Text>
             </View>
             <Text>{user.email}</Text>
           </Pressable>
         )}
         keyExtractor={item => item.id!}
       />
-      <View className="flex flex-row justify-around">
-        <PressableButton
+      <View>
+        {/* <PressableButton
           label="Clear"
           type="secondary"
           onPress={() => setSelectedUsers([])}
         />
-        <PressableButton label="Create" onPress={() => onConfirmPress()} />
+        <PressableButton label="Create" onPress={() => onConfirmPress()} /> */}
       </View>
       {timeFor && (
         <RNDateTimePicker

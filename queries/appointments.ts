@@ -1,6 +1,10 @@
-import { format } from "date-fns";
+import { format, parse, parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { AgendaSchedule } from "react-native-calendars";
+import {
+  AgendaSchedule,
+  CalendarUtils,
+  TimelineEventProps as Event,
+} from "react-native-calendars";
 
 import { PostgrestError } from "@supabase/supabase-js";
 import {
@@ -20,11 +24,24 @@ import {
   NewAppointment,
 } from "../shared/types/entities";
 import { SQL_DATE_FORMAT } from "../shared/utils";
-import { QUERY_KEYS } from "./";
+import { QUERY_KEYS } from ".";
+import { useTheme } from "tamagui";
 
-export const useAppointmentsData = (from?: Date, to?: Date) => {
+type EventSchedule = {
+  [date: string]: Event[];
+};
+
+const EVENT_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+
+export const useAppointmentsData = (
+  isFocused: boolean,
+  from?: Date,
+  to?: Date
+) => {
   const { client } = useSupabase();
   const queryClient = useQueryClient();
+
+  const { backgroundSoft } = useTheme();
 
   const clientQuery = client
     ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
@@ -39,7 +56,7 @@ export const useAppointmentsData = (from?: Date, to?: Date) => {
       appointments: ExtendedAppointmentRow[];
     },
     PostgrestError,
-    AgendaSchedule
+    EventSchedule
   >(
     [QUERY_KEYS.appointments, from, to],
     async () => {
@@ -54,47 +71,53 @@ export const useAppointmentsData = (from?: Date, to?: Date) => {
       }: {
         appointments: ExtendedAppointmentRow[];
       }) => {
-        const scheduleMapped: AgendaSchedule = appointments.reduce(
+        const scheduleMapped: EventSchedule = appointments.reduce(
           (schedule, appointment) => {
             const { day, clients, from, to } = appointment;
+            const formatDateTime = (time: string) =>
+              format(parseISO(`${day}T${time}`), EVENT_TIME_FORMAT);
             if (clients) {
               if (schedule[day]) {
                 Array.isArray(clients)
                   ? schedule[day].push({
-                      name: `${clients[0].first_name} ${clients[0].last_name}`,
-                      height: -20,
-                      day: `${from}-${to}`,
+                      title: `${clients[0].first_name} ${clients[0].last_name}`,
+                      start: formatDateTime(from),
+                      end: formatDateTime(to),
+                      color: "red",
                     })
                   : schedule[day].push({
-                      name: `${clients.first_name} ${clients.last_name}`,
-                      height: 0,
-                      day: `${from}-${to}`,
+                      title: `${clients.first_name} ${clients.last_name}`,
+                      start: formatDateTime(from),
+                      end: formatDateTime(to),
+                      color: backgroundSoft.val,
                     });
               } else {
                 schedule[day] = Array.isArray(clients)
                   ? [
                       {
-                        name: `${clients[0].first_name} ${clients[0].last_name}`,
-                        height: -10,
-                        day: `${from}-${to}`,
+                        title: `${clients[0].first_name} ${clients[0].last_name}`,
+                        start: formatDateTime(from),
+                        end: formatDateTime(to),
+                        color: "red",
                       },
                     ]
                   : [
                       {
-                        name: `${clients.first_name} ${clients.last_name}`,
-                        height: -20,
-                        day: `${from}-${to}`,
+                        title: `${clients.first_name} ${clients.last_name}`,
+                        start: formatDateTime(from),
+                        end: formatDateTime(to),
+                        color: backgroundSoft.val,
                       },
                     ];
               }
             }
             return schedule;
           },
-          {} as AgendaSchedule
+          {} as EventSchedule
         );
         return scheduleMapped;
       },
-      enabled: !!from && !!to,
+      enabled: !!from && !!to && isFocused,
     }
   );
   return { data, isLoading, isStale };

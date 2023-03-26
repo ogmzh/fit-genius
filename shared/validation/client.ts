@@ -37,7 +37,7 @@ export const clientUserSchema = z.object({
     .max(500, "Too high value")
     .optional()
     .or(z.literal("")),
-  dateOfBirth: z.date().optional(),
+  dateOfBirth: z.date().optional().or(z.literal("")),
   goals: z.string().optional().nullable(),
   notes: z.string().optional(),
 });
