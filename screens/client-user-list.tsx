@@ -1,17 +1,11 @@
 import { useRouter } from "expo-router";
 import { FlatList } from "react-native-gesture-handler";
-import {
-  Button,
-  Paragraph,
-  Spinner,
-  useTheme,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Button, Spinner, YStack } from "tamagui";
 
 import { Trash } from "@tamagui/lucide-icons";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { ClientCard } from "../components/client-card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { FloatingActionButton } from "../components/floating-action-button";
 import ScreenContainer from "../components/screen-container";
@@ -36,7 +30,11 @@ export function ClientUserListScreen() {
             data={data?.clients}
             keyExtractor={item => item.id!}
             renderItem={({ item }) => (
-              <XStack
+              <ClientCard
+                key={item.id}
+                firstName={item.firstName}
+                lastName={item.lastName}
+                email={item.email}
                 onPress={() => {
                   // preload query data if it's not stale
                   // so we don't have to unnecessarily (p)refetch
@@ -46,26 +44,7 @@ export function ClientUserListScreen() {
                       item
                     );
                   push(`clients/${item.id}`);
-                }}
-                jc="space-between"
-                ai="center"
-                bg="$backgroundSoft"
-                px="$4"
-                py="$3"
-                mb="$4"
-                br="$2"
-                mx="$6"
-                boc="$backgroundSoft"
-                bw="$1"
-                pressStyle={{
-                  bg: "$backgroundSoftActive",
                 }}>
-                <YStack>
-                  <Paragraph col="$text" fontWeight="bold" size="$6">
-                    {item.firstName} {item.lastName}
-                  </Paragraph>
-                  <Paragraph col="$textSoft">{item.email}</Paragraph>
-                </YStack>
                 <ConfirmDialog
                   title="Delete"
                   onConfirm={() => item.id && deleteUser(item.id)}
@@ -81,7 +60,7 @@ export function ClientUserListScreen() {
                     }}
                   />
                 </ConfirmDialog>
-              </XStack>
+              </ClientCard>
             )}
           />
         )}

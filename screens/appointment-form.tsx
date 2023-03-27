@@ -13,6 +13,7 @@ import { useUsersData } from "../queries/clients";
 import { ClientUser } from "../shared/types/entities";
 import { HUMAN_DATE_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
 import { FlatList } from "react-native";
+import { ClientCard } from "../components/client-card";
 
 const now = new Date();
 
@@ -37,8 +38,6 @@ const NewAppointmentScreen = () => {
   const { appointment: id } = useLocalSearchParams<{
     appointment: string;
   }>();
-
-  console.log("id???", id);
 
   const { data } = useUsersData();
   const { createAppointmentAsync, isLoading: isMutating } =
@@ -121,7 +120,6 @@ const NewAppointmentScreen = () => {
   };
 
   const onConfirmPress = async () => {
-    console.log("confirm");
     if (timeFrom && timeTo && selectedUsers.length > 0) {
       await createAppointmentAsync({
         clientIds: selectedUsers.map(user => user.id!),
@@ -139,6 +137,10 @@ const NewAppointmentScreen = () => {
         <Paragraph
           size="$8"
           fow="bold"
+          bg="$backgroundSoft"
+          px="$4"
+          py="$2"
+          br="$2"
           mb="$2"
           alignSelf="center"
           disabled={isMutating}
@@ -151,6 +153,7 @@ const NewAppointmentScreen = () => {
             bw="$1.5"
             boc="$accent"
             p="$3"
+            bg="$backgroundSoft"
             disabled={isMutating}
             onPress={() => setTimeFor("from")}>
             <Paragraph size="$8">From</Paragraph>
@@ -165,6 +168,7 @@ const NewAppointmentScreen = () => {
             bw="$1.5"
             boc="$accent"
             p="$3"
+            bg="$backgroundSoft"
             disabled={isMutating}
             onPress={() => setTimeFor("to")}>
             <Paragraph size="$8">To</Paragraph>
@@ -178,35 +182,15 @@ const NewAppointmentScreen = () => {
         <FlatList
           data={data?.clients}
           renderItem={({ item: user }) => (
-            <XStack
+            <ClientCard
+              firstName={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+              isSelected={selectedUsers.some(
+                selectedUser => selectedUser.id === user.id
+              )}
               onPress={() => toggleSelectedUser(user)}
-              f={1}
-              jc="space-between"
-              ai="center"
-              bg="$backgroundSoft"
-              px="$4"
-              py="$3"
-              mb="$4"
-              br="$2"
-              mx="$6"
-              pressStyle={{
-                bg: "$backgroundSoftActive",
-              }}
-              boc={
-                selectedUsers.some(
-                  selectedUser => selectedUser.id === user.id
-                )
-                  ? "$accent"
-                  : "$backgroundSoft"
-              }
-              bw="$1">
-              <YStack>
-                <Paragraph col="$text" size="$6" fow="bold">
-                  {user.firstName} {user.lastName}
-                </Paragraph>
-                <Paragraph col="$textSoft">{user.email}</Paragraph>
-              </YStack>
-            </XStack>
+            />
           )}
           keyExtractor={item => item.id!}
           contentContainerStyle={{ paddingBottom: 200 }}

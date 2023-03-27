@@ -15,12 +15,13 @@
 - [x] fix a bug on appointment card time being AM/PM wrong
 - [ ] change user's appointment date
 - [ ] change user's appointment time
+- [ ] if i select an apppointment for which i already have users, select them
 - [x] delete appointments
 - [ ] search users by name on the new appointment screen
-- [ ] refactor appointment-form and client-user-list user-cards to a component
-- [ ] refactor appointment-form and client-user-list form buttons to a component
-- [ ] refactor time picker to a component
 
 ## UI
 
 - [x] seriously consider going for RNUI lib | tamagui
+- [x] refactor appointment-form and client-user-list user-cards to a component
+- [ ] refactor appointment-form and client-user-list form buttons to a component
+- [ ] refactor time picker to a component
