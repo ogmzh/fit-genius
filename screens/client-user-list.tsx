@@ -1,18 +1,12 @@
 import { useRouter } from "expo-router";
 import { FlatList } from "react-native-gesture-handler";
-import {
-  Button,
-  Paragraph,
-  Spinner,
-  useTheme,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Paragraph, Spinner, useTheme, XStack, YStack } from "tamagui";
 
-import { Plus, Trash } from "@tamagui/lucide-icons";
+import { Trash } from "@tamagui/lucide-icons";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { ConfirmDialog } from "../components/confirm-dialog";
+import { FloatingActionButton } from "../components/floating-action-button";
 import ScreenContainer from "../components/screen-container";
 import { QUERY_KEYS } from "../queries";
 import { useMutateUsers, useUsersData } from "../queries/clients";
@@ -76,18 +70,7 @@ export function ClientUserListScreen() {
             )}
           />
         )}
-        <Button
-          pos="absolute"
-          bottom="$8"
-          right="$8"
-          elevate
-          w="$5"
-          h="$5"
-          bg="$accent"
-          pressStyle={{ bg: "$accentActive" }}
-          icon={<Plus size="$2" color="$icon" />}
-          onPress={() => push("clients/new")}
-        />
+        <FloatingActionButton onPress={() => push("clients/new")} />
       </YStack>
     </ScreenContainer>
   );

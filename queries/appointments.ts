@@ -35,7 +35,6 @@ export const useAppointmentsData = (
   to?: Date
 ) => {
   const { client } = useSupabase();
-  console.log("fetching appointmnets for", from, to);
   const { backgroundSoft } = useTheme();
 
   const clientQuery = client

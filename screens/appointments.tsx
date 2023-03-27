@@ -1,4 +1,3 @@
-import { useIsFocused } from "@react-navigation/native";
 import {
   addHours,
   endOfMonth,
@@ -15,8 +14,12 @@ import {
   ExpandableCalendar,
   TimelineList,
 } from "react-native-calendars";
-import { MarkedDates } from "react-native-calendars/src/types";
+import { DateData, MarkedDates } from "react-native-calendars/src/types";
 import { Spinner, YStack, useTheme } from "tamagui";
+
+import { useIsFocused } from "@react-navigation/native";
+
+import { FloatingActionButton } from "../components/floating-action-button";
 import ScreenContainer from "../components/screen-container";
 import { useAppointmentsData } from "../queries/appointments";
 import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
@@ -77,12 +80,8 @@ const AppointmentScreen = () => {
     return null;
   }
 
-  const onMonthChange = (month: any, updateSource: any) => {
-    console.log(
-      "TimelineCalendarScreen onMonthChange:",
-      month,
-      updateSource
-    );
+  const onMonthChange = (month: DateData) => {
+    setSelectedDate(month.dateString);
   };
 
   const theme = {
@@ -104,7 +103,7 @@ const AppointmentScreen = () => {
         }}
         todayButtonStyle={{ backgroundColor: secondary.val }}
         date={selectedDate}
-        onDateChanged={date => setSelectedDate(date)}
+        // onDateChanged={date => setSCelesctedDate(date)}
         onMonthChange={onMonthChange}>
         <ExpandableCalendar
           firstDay={1}
@@ -144,6 +143,15 @@ const AppointmentScreen = () => {
           />
         )}
       </CalendarProvider>
+      <FloatingActionButton
+        onPress={() =>
+          push(
+            `appointments/new?${newAppointmentQueryDateString(
+              selectedDate
+            )}`
+          )
+        }
+      />
     </ScreenContainer>
   );
 };
