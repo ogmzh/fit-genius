@@ -1,10 +1,6 @@
-import { format, parse, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import {
-  AgendaSchedule,
-  CalendarUtils,
-  TimelineEventProps as Event,
-} from "react-native-calendars";
+import { TimelineEventProps as Event } from "react-native-calendars";
 
 import { PostgrestError } from "@supabase/supabase-js";
 import {
@@ -39,8 +35,7 @@ export const useAppointmentsData = (
   to?: Date
 ) => {
   const { client } = useSupabase();
-  const queryClient = useQueryClient();
-
+  console.log("fetching appointmnets for", from, to);
   const { backgroundSoft } = useTheme();
 
   const clientQuery = client

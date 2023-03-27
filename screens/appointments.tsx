@@ -1,11 +1,12 @@
 import { useIsFocused } from "@react-navigation/native";
 import {
   addHours,
-  endOfWeek,
+  endOfMonth,
   format,
   getHours,
+  parse,
   setHours,
-  startOfWeek,
+  startOfMonth,
 } from "date-fns";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
@@ -48,18 +49,10 @@ const AppointmentScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const isFocused = useIsFocused();
 
-  const selectedDateObject = useMemo(
-    () => new Date(selectedDate),
-    [selectedDate]
-  );
   const { data: appointments, isLoading } = useAppointmentsData(
     isFocused,
-    startOfWeek(selectedDateObject, {
-      weekStartsOn: 1,
-    }),
-    endOfWeek(selectedDateObject, {
-      weekStartsOn: 1,
-    })
+    startOfMonth(parse(selectedDate, SQL_DATE_FORMAT, now)),
+    endOfMonth(parse(selectedDate, SQL_DATE_FORMAT, now))
   );
   const { background, secondary, text, textSoft, accent } = useTheme();
 
