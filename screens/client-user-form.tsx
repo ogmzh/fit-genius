@@ -37,13 +37,15 @@ export default function ClientUserFormScreen() {
     reValidateMode: "onSubmit",
   });
 
+  const { watch, setValue, handleSubmit, setError, reset, formState } =
+    methods;
+  const { isValid, defaultValues } = formState;
+
   useEffect(() => {
-    if (id && existingUser && isEmpty(methods.formState.defaultValues)) {
+    if (id && existingUser && isEmpty(defaultValues)) {
       methods.reset({ ...existingUser });
     }
   }, [id, existingUser]);
-
-  const { watch, setValue, handleSubmit, setError, reset } = methods;
 
   const dateOfBirth = watch("dateOfBirth");
 
@@ -170,15 +172,11 @@ export default function ClientUserFormScreen() {
             <Button
               w="$10"
               pressStyle={{ bg: "$secondarySoft" }}
+              color="$textSoft"
               bg={
                 isLoadingCreate || isLoadingUpdate
                   ? "$backgroundDisabled"
-                  : "$secondary"
-              }
-              color={
-                isLoadingCreate || isLoadingUpdate
-                  ? "$textDisabled"
-                  : "$buttonText"
+                  : "$backgroundSoft"
               }
               disabled={isLoadingCreate || isLoadingUpdate}
               onPress={() => reset()}>
@@ -187,17 +185,17 @@ export default function ClientUserFormScreen() {
             <Button
               w="$10"
               bg={
-                isLoadingCreate || isLoadingUpdate
+                isLoadingCreate || isLoadingUpdate || !isValid
                   ? "$backgroundDisabled"
                   : "$primary"
               }
               color={
-                isLoadingCreate || isLoadingUpdate
+                isLoadingCreate || isLoadingUpdate || !isValid
                   ? "$textDisabled"
                   : "$buttonText"
               }
               pressStyle={{ bg: "$primarySoft" }}
-              disabled={isLoadingCreate || isLoadingUpdate}
+              disabled={isLoadingCreate || isLoadingUpdate || !isValid}
               onPress={handleSubmit(onSubmit)}>
               Confirm
             </Button>

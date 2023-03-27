@@ -1,22 +1,18 @@
 import { addHours, format } from "date-fns";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  SafeAreaView,
-  Text,
-  View,
-} from "react-native";
 
 import RNDateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
+import { Button, Paragraph, Stack, XStack, YStack } from "tamagui";
+import ScreenContainer from "../components/screen-container";
 import { useMutateAppointments } from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
 import { ClientUser } from "../shared/types/entities";
 import { HUMAN_DATE_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
+import { FlatList } from "react-native";
 
 const now = new Date();
 
@@ -42,8 +38,11 @@ const NewAppointmentScreen = () => {
     appointment: string;
   }>();
 
+  console.log("id???", id);
+
   const { data } = useUsersData();
-  const { createAppointmentAsync, isLoading } = useMutateAppointments();
+  const { createAppointmentAsync, isLoading: isMutating } =
+    useMutateAppointments();
 
   const queryDateTimeFrom = queryFrom
     ? new Date(`${queryDate}T${queryFrom}`)
@@ -122,6 +121,7 @@ const NewAppointmentScreen = () => {
   };
 
   const onConfirmPress = async () => {
+    console.log("confirm");
     if (timeFrom && timeTo && selectedUsers.length > 0) {
       await createAppointmentAsync({
         clientIds: selectedUsers.map(user => user.id!),
@@ -134,43 +134,116 @@ const NewAppointmentScreen = () => {
   };
 
   return (
-    <SafeAreaView>
-      <View>
-        <Pressable onPress={() => setTimeFor("date")}>
-          <Text>{format(selectedDate, HUMAN_DATE_FORMAT)}</Text>
-        </Pressable>
-      </View>
-      <View>
-        <Pressable disabled={isLoading} onPress={() => setTimeFor("from")}>
-          <Text>From</Text>
-          <Text>{timeFrom && format(timeFrom, "HH:mm")}</Text>
-        </Pressable>
-        <Pressable disabled={isLoading} onPress={() => setTimeFor("to")}>
-          <Text>To</Text>
-          <Text>{timeTo && format(timeTo, "HH:mm")}</Text>
-        </Pressable>
-      </View>
-      <FlatList
-        data={data?.clients}
-        renderItem={({ item: user }) => (
-          <Pressable onPress={() => toggleSelectedUser(user)}>
-            <View>
-              <Text>{user.firstName}</Text>
-              <Text>{user.lastName}</Text>
-            </View>
-            <Text>{user.email}</Text>
-          </Pressable>
-        )}
-        keyExtractor={item => item.id!}
-      />
-      <View>
-        {/* <PressableButton
-          label="Clear"
-          type="secondary"
-          onPress={() => setSelectedUsers([])}
+    <ScreenContainer>
+      <YStack mb="$4">
+        <Paragraph
+          size="$8"
+          fow="bold"
+          mb="$2"
+          alignSelf="center"
+          disabled={isMutating}
+          onPress={() => setTimeFor("date")}>
+          {format(selectedDate, HUMAN_DATE_FORMAT)}
+        </Paragraph>
+        <XStack p="$2" mb="$4" alignSelf="stretch" jc="space-around">
+          <YStack
+            br="$4"
+            bw="$1.5"
+            boc="$accent"
+            p="$3"
+            disabled={isMutating}
+            onPress={() => setTimeFor("from")}>
+            <Paragraph size="$8">From</Paragraph>
+            <Stack>
+              <Paragraph size="$10">
+                {timeFrom && format(timeFrom, "HH:mm")}
+              </Paragraph>
+            </Stack>
+          </YStack>
+          <YStack
+            br="$4"
+            bw="$1.5"
+            boc="$accent"
+            p="$3"
+            disabled={isMutating}
+            onPress={() => setTimeFor("to")}>
+            <Paragraph size="$8">To</Paragraph>
+            <Stack>
+              <Paragraph size="$10">
+                {timeTo && format(timeTo, "HH:mm")}
+              </Paragraph>
+            </Stack>
+          </YStack>
+        </XStack>
+        <FlatList
+          data={data?.clients}
+          renderItem={({ item: user }) => (
+            <XStack
+              onPress={() => toggleSelectedUser(user)}
+              f={1}
+              jc="space-between"
+              ai="center"
+              bg="$backgroundSoft"
+              px="$4"
+              py="$3"
+              mb="$4"
+              br="$2"
+              mx="$6"
+              pressStyle={{
+                bg: "$backgroundSoftActive",
+              }}
+              boc={
+                selectedUsers.some(
+                  selectedUser => selectedUser.id === user.id
+                )
+                  ? "$accent"
+                  : "$backgroundSoft"
+              }
+              bw="$1">
+              <YStack>
+                <Paragraph col="$text" size="$6" fow="bold">
+                  {user.firstName} {user.lastName}
+                </Paragraph>
+                <Paragraph col="$textSoft">{user.email}</Paragraph>
+              </YStack>
+            </XStack>
+          )}
+          keyExtractor={item => item.id!}
+          contentContainerStyle={{ paddingBottom: 200 }}
+          ListFooterComponent={() => (
+            <XStack alignSelf="center" gap="$4">
+              <Button
+                w="$10"
+                onPress={() => setSelectedUsers([])}
+                pressStyle={{ bg: "$backgroundSoftActive" }}
+                disabled={isMutating}
+                color="$textSoft"
+                bg={
+                  isMutating ? "$backgroundDisabled" : "$backgroundSoft"
+                }>
+                Reset
+              </Button>
+              <Button
+                onPress={onConfirmPress}
+                w="$10"
+                disabled={isMutating || selectedUsers.length === 0}
+                bg={
+                  isMutating || selectedUsers.length === 0
+                    ? "$backgroundDisabled"
+                    : "$primary"
+                }
+                color={
+                  isMutating || selectedUsers.length === 0
+                    ? "$textDisabled"
+                    : "$buttonText"
+                }
+                pressStyle={{ bg: "$primarySoft" }}>
+                Confirm
+              </Button>
+            </XStack>
+          )}
         />
-        <PressableButton label="Create" onPress={() => onConfirmPress()} /> */}
-      </View>
+      </YStack>
       {timeFor && (
         <RNDateTimePicker
           value={pickerValue()}
@@ -179,7 +252,46 @@ const NewAppointmentScreen = () => {
           onChange={(event, value) => onTimeChange(event, value)}
         />
       )}
-    </SafeAreaView>
+    </ScreenContainer>
+    // <SafeAreaView>
+    //   <View>
+    //     <Pressable onPress={() => setTimeFor("date")}>
+    //       <Text>{format(selectedDate, HUMAN_DATE_FORMAT)}</Text>
+    //     </Pressable>
+    //   </View>
+    //   <View>
+    //     <Pressable disabled={isLoading} onPress={() => setTimeFor("from")}>
+    //       <Text>From</Text>
+    //       <Text>{timeFrom && format(timeFrom, "HH:mm")}</Text>
+    //     </Pressable>
+    //     <Pressable disabled={isLoading} onPress={() => setTimeFor("to")}>
+    //       <Text>To</Text>
+    //       <Text>{timeTo && format(timeTo, "HH:mm")}</Text>
+    //     </Pressable>
+    //   </View>
+    //   <FlatList
+    //     data={data?.clients}
+    //     renderItem={({ item: user }) => (
+    //       <Pressable onPress={() => toggleSelectedUser(user)}>
+    //         <View>
+    //           <Text>{user.firstName}</Text>
+    //           <Text>{user.lastName}</Text>
+    //         </View>
+    //         <Text>{user.email}</Text>
+    //       </Pressable>
+    //     )}
+    //     keyExtractor={item => item.id!}
+    //   />
+    //   <View>
+    //     {/* <PressableButton
+    //       label="Clear"
+    //       type="secondary"
+    //       onPress={() => setSelectedUsers([])}
+    //     />
+    //     <PressableButton label="Create" onPress={() => onConfirmPress()} /> */}
+    //   </View>
+
+    // </SafeAreaView>
   );
 };
 

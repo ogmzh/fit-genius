@@ -8,21 +8,37 @@ import {
   startOfMonth,
 } from "date-fns";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarProvider,
   ExpandableCalendar,
   TimelineList,
+  TimelineEventProps as Event,
 } from "react-native-calendars";
 import { DateData, MarkedDates } from "react-native-calendars/src/types";
-import { Spinner, YStack, useTheme } from "tamagui";
+import {
+  Button,
+  Paragraph,
+  Sheet,
+  Spinner,
+  XStack,
+  YStack,
+  useTheme,
+} from "tamagui";
 
 import { useIsFocused } from "@react-navigation/native";
 
+import { Trash } from "@tamagui/lucide-icons";
+import { ConfirmDialog } from "../components/confirm-dialog";
 import { FloatingActionButton } from "../components/floating-action-button";
 import ScreenContainer from "../components/screen-container";
-import { useAppointmentsData } from "../queries/appointments";
+import {
+  useAppointmentsData,
+  useMutateAppointments,
+} from "../queries/appointments";
 import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
+
+const START_TIME = 7;
 
 const randomColor = () =>
   `#${Math.floor(Math.random() * 16_777_215).toString(16)}`;
@@ -34,8 +50,9 @@ const newAppointmentQueryDateString = (
   selectedDay: string,
   withHours = false
 ) => {
+  // silly library doesn't pass hours as time but how many hours have passed since the start of the workday
   const selected = withHours
-    ? new Date(selectedDay)
+    ? addHours(new Date(selectedDay), START_TIME)
     : setHours(new Date(selectedDay), getHours(now) + 1);
   const nextTimeslot =
     selected.getMinutes() === 0
@@ -51,12 +68,18 @@ const newAppointmentQueryDateString = (
 const AppointmentScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const isFocused = useIsFocused();
+  const [showEventOptions, setShowEventOptions] = useState<Event | null>(
+    null
+  );
 
   const { data: appointments, isLoading } = useAppointmentsData(
     isFocused,
     startOfMonth(parse(selectedDate, SQL_DATE_FORMAT, now)),
     endOfMonth(parse(selectedDate, SQL_DATE_FORMAT, now))
   );
+
+  const { deleteAppointmentAsync, isDeleting } = useMutateAppointments();
+
   const { background, secondary, text, textSoft, accent } = useTheme();
 
   const { push } = useRouter();
@@ -74,6 +97,12 @@ const AppointmentScreen = () => {
         )
       : {};
   }, [appointments]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setShowEventOptions(null);
+    }
+  }, [isFocused]);
 
   // heavyweight component
   if (!isFocused) {
@@ -103,7 +132,6 @@ const AppointmentScreen = () => {
         }}
         todayButtonStyle={{ backgroundColor: secondary.val }}
         date={selectedDate}
-        // onDateChanged={date => setSCelesctedDate(date)}
         onMonthChange={onMonthChange}>
         <ExpandableCalendar
           firstDay={1}
@@ -121,9 +149,17 @@ const AppointmentScreen = () => {
             scrollToNow
             showNowIndicator
             timelineProps={{
-              start: 7,
+              onEventPress: (event: Event) => setShowEventOptions(event),
+              onBackgroundLongPress: timeString =>
+                push(
+                  `appointments/new?${newAppointmentQueryDateString(
+                    timeString,
+                    true
+                  )}`
+                ),
+              start: START_TIME,
               end: 23,
-              format24h: false,
+              format24h: true,
               overlapEventsSpacing: 5,
               theme: {
                 ...theme,
@@ -152,6 +188,58 @@ const AppointmentScreen = () => {
           )
         }
       />
+      <Sheet
+        open={!!showEventOptions}
+        snapPoints={[50, 20]}
+        dismissOnSnapToBottom
+        dismissOnOverlayPress
+        onOpenChange={() => setShowEventOptions(null)}>
+        <Sheet.Overlay />
+        <Sheet.Handle />
+        <Sheet.Frame f={1} p="$4" space="$5">
+          <YStack>
+            {showEventOptions && (
+              <XStack ai="center" jc="space-between">
+                <Paragraph size="$6" fow="bold">
+                  {showEventOptions.title}
+                </Paragraph>
+                <Paragraph>
+                  {`${showEventOptions.start.split(" ")[1]} - ${
+                    showEventOptions.end.split(" ")[1]
+                  }`}
+                </Paragraph>
+              </XStack>
+            )}
+            {isDeleting ? (
+              <Spinner size="large" />
+            ) : (
+              <XStack mt="$4">
+                <ConfirmDialog
+                  title="Delete"
+                  onConfirm={async () => {
+                    if (showEventOptions?.id) {
+                      await deleteAppointmentAsync(showEventOptions.id);
+                      setShowEventOptions(null);
+                    }
+                  }}
+                  description={`Are you sure you want to remove this appointment?`}>
+                  <Button
+                    circular
+                    size="$5"
+                    disabled={isDeleting}
+                    icon={<Trash size="$2" />}
+                    backgroundColor="$warning"
+                    color="white"
+                    pressStyle={{
+                      bg: "$danger",
+                    }}
+                  />
+                </ConfirmDialog>
+              </XStack>
+            )}
+          </YStack>
+        </Sheet.Frame>
+      </Sheet>
     </ScreenContainer>
   );
 };

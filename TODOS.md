@@ -10,9 +10,16 @@
 - [x] refactor the existing form to tamagui
 - [x] change the date of birth picker component
   - [ ] implement rn datepicker it for iOS as well; use the component approach (https://github.com/react-native-datetimepicker/datetimepicker )
-- [ ] change the query to fetch all the appointments for the month and make it a long lasting query
+- [x] change the query to fetch all the appointments for the month and make it a long lasting query
+- [x] reimplement create appointment screen
+- [x] fix a bug on appointment card time being AM/PM wrong
+- [ ] change user's appointment date
+- [ ] change user's appointment time
+- [x] delete appointments
 - [ ] search users by name on the new appointment screen
-- [ ] update & delete appointments
+- [ ] refactor appointment-form and client-user-list user-cards to a component
+- [ ] refactor appointment-form and client-user-list form buttons to a component
+- [ ] refactor time picker to a component
 
 ## UI
 

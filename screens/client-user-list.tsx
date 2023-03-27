@@ -1,6 +1,13 @@
 import { useRouter } from "expo-router";
 import { FlatList } from "react-native-gesture-handler";
-import { Paragraph, Spinner, useTheme, XStack, YStack } from "tamagui";
+import {
+  Button,
+  Paragraph,
+  Spinner,
+  useTheme,
+  XStack,
+  YStack,
+} from "tamagui";
 
 import { Trash } from "@tamagui/lucide-icons";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,7 +20,6 @@ import { useMutateUsers, useUsersData } from "../queries/clients";
 
 export function ClientUserListScreen() {
   const { data, isLoading, isStale } = useUsersData();
-  const { danger } = useTheme();
 
   const queryClient = useQueryClient();
   const { delete: deleteUser } = useMutateUsers();
@@ -55,7 +61,7 @@ export function ClientUserListScreen() {
                   bg: "$backgroundSoftActive",
                 }}>
                 <YStack>
-                  <Paragraph col="$text" fontWeight="bold">
+                  <Paragraph col="$text" fontWeight="bold" size="$6">
                     {item.firstName} {item.lastName}
                   </Paragraph>
                   <Paragraph col="$textSoft">{item.email}</Paragraph>
@@ -64,7 +70,16 @@ export function ClientUserListScreen() {
                   title="Delete"
                   onConfirm={() => item.id && deleteUser(item.id)}
                   description={`Are you sure you want to delete user ${item.firstName} ${item.lastName}?`}>
-                  <Trash color={danger.val} size="$1" />
+                  <Button
+                    circular
+                    size="$3"
+                    icon={Trash}
+                    backgroundColor="$warning"
+                    color="white"
+                    pressStyle={{
+                      bg: "$danger",
+                    }}
+                  />
                 </ConfirmDialog>
               </XStack>
             )}

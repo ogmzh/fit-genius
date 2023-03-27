@@ -26,7 +26,7 @@ export const ConfirmDialog = ({
 }: Props) => {
   return (
     <AlertDialog>
-      <AlertDialog.Trigger>{children}</AlertDialog.Trigger>
+      <AlertDialog.Trigger asChild>{children}</AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay
           key="overlay"
@@ -72,7 +72,7 @@ export const ConfirmDialog = ({
               {!hideConfirm && (
                 <AlertDialog.Action asChild>
                   <Button
-                    bg="$info"
+                    bg="$primary"
                     color="$text"
                     onPress={onConfirm && (() => onConfirm())}>
                     {confirmText}

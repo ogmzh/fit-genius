@@ -67,19 +67,21 @@ export const useAppointmentsData = (
       }) => {
         const scheduleMapped: EventSchedule = appointments.reduce(
           (schedule, appointment) => {
-            const { day, clients, from, to } = appointment;
+            const { day, clients, from, to, id } = appointment;
             const formatDateTime = (time: string) =>
               format(parseISO(`${day}T${time}`), EVENT_TIME_FORMAT);
             if (clients) {
               if (schedule[day]) {
                 Array.isArray(clients)
                   ? schedule[day].push({
+                      id,
                       title: `${clients[0].first_name} ${clients[0].last_name}`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
                       color: "red",
                     })
                   : schedule[day].push({
+                      id,
                       title: `${clients.first_name} ${clients.last_name}`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
@@ -89,6 +91,7 @@ export const useAppointmentsData = (
                 schedule[day] = Array.isArray(clients)
                   ? [
                       {
+                        id,
                         title: `${clients[0].first_name} ${clients[0].last_name}`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
@@ -97,6 +100,7 @@ export const useAppointmentsData = (
                     ]
                   : [
                       {
+                        id,
                         title: `${clients.first_name} ${clients.last_name}`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
@@ -153,9 +157,30 @@ export const useMutateAppointments = () => {
     }
   );
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await client
+        ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
+          DatabaseTables.APPOINTMENTS
+        )
+        .delete()
+        .eq("id", id);
+      return {
+        status: response?.status,
+        statusText: response?.statusText,
+        error: response?.error,
+      };
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries([QUERY_KEYS.appointments]),
+  });
+
   return {
     createAppointment: createMutation.mutate,
     createAppointmentAsync: createMutation.mutateAsync,
     isLoading: createMutation.isLoading,
+    deleteAppointment: deleteMutation.mutate,
+    deleteAppointmentAsync: deleteMutation.mutateAsync,
+    isDeleting: deleteMutation.isLoading,
   };
 };
