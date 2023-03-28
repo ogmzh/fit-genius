@@ -36,7 +36,6 @@ export const AppointmentPicker = ({
     value: Date | undefined
   ) => {
     setTimeFor(null); // must set this first before updating date state
-
     if (event.type === "set" && value) {
       switch (timeFor) {
         case "from": {

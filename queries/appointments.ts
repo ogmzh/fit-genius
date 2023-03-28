@@ -157,6 +157,41 @@ export const useMutateAppointments = () => {
     }
   );
 
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      id,
+      date,
+      from,
+      to,
+    }: {
+      id: string;
+      date: Date;
+      from: Date;
+      to: Date;
+    }) => {
+      const response = await client
+        ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
+          DatabaseTables.APPOINTMENTS
+        )
+        .update({
+          day: format(date, SQL_DATE_FORMAT),
+          from: formatInTimeZone(from, "UTC", "HH:mmX"),
+          to: formatInTimeZone(to, "UTC", "HH:mmX"),
+        })
+        .eq("id", id);
+      return {
+        status: response?.status,
+        statusText: response?.statusText,
+        error: response?.error,
+      };
+    },
+    onSuccess: data => {
+      if (data.status === HttpStatusCode.NO_CONTENT) {
+        return queryClient.invalidateQueries([QUERY_KEYS.appointments]);
+      }
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await client
@@ -182,5 +217,8 @@ export const useMutateAppointments = () => {
     deleteAppointment: deleteMutation.mutate,
     deleteAppointmentAsync: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isLoading,
+    updateAppointment: updateMutation.mutate,
+    updateAppointmentAsync: updateMutation.mutateAsync,
+    isUpdating: updateMutation.isLoading,
   };
 };

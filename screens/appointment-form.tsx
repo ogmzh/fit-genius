@@ -61,7 +61,7 @@ const NewAppointmentScreen = () => {
   }, [timeTo, queryDateTimeTo]);
 
   useEffect(() => {
-    if (timeFrom && timeFrom.getHours() !== queryDateTimeFrom.getHours()) {
+    if (timeFrom) {
       setTimeTo(addHours(timeFrom, 1));
     }
   }, [timeFrom]);

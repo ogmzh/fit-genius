@@ -6,6 +6,7 @@ import { ClientUserSchema } from "./validation/client";
 export const HUMAN_DATE_FORMAT = "MMM dd. yyyy";
 export const SQL_DATE_FORMAT = "yyyy-MM-dd";
 export const TIME_FORMAT = "HH:mm";
+export const CALENDAR_DATE_FORMAT = `${SQL_DATE_FORMAT} ${TIME_FORMAT}`;
 
 export const mapClientRowToFormObject = (
   row: ClientRow
