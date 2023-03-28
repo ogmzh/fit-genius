@@ -21,6 +21,7 @@ import {
   Paragraph,
   Sheet,
   Spinner,
+  Stack,
   XStack,
   YStack,
   useTheme,
@@ -37,6 +38,7 @@ import {
   useMutateAppointments,
 } from "../queries/appointments";
 import { SQL_DATE_FORMAT, TIME_FORMAT } from "../shared/utils";
+import { AppointmentPicker } from "../components/appointment-picker";
 
 const START_TIME = 7;
 
@@ -132,6 +134,7 @@ const AppointmentScreen = () => {
         }}
         todayButtonStyle={{ backgroundColor: secondary.val }}
         date={selectedDate}
+        onDateChanged={date => setSelectedDate(date)}
         onMonthChange={onMonthChange}>
         <ExpandableCalendar
           firstDay={1}
@@ -203,17 +206,23 @@ const AppointmentScreen = () => {
                 <Paragraph size="$6" fow="bold">
                   {showEventOptions.title}
                 </Paragraph>
-                <Paragraph>
-                  {`${showEventOptions.start.split(" ")[1]} - ${
-                    showEventOptions.end.split(" ")[1]
-                  }`}
-                </Paragraph>
               </XStack>
             )}
             {isDeleting ? (
               <Spinner size="large" />
             ) : (
-              <XStack mt="$4">
+              <YStack mt="$4">
+                <YStack w="$15" alignSelf="center">
+                  <AppointmentPicker
+                    size="small"
+                    date={new Date()}
+                    onDateChange={() => {}}
+                    onTimeFromChange={() => {}}
+                    onTimeToChange={() => {}}
+                    timeFrom={new Date()}
+                    timeTo={new Date()}
+                  />
+                </YStack>
                 <ConfirmDialog
                   title="Delete"
                   onConfirm={async () => {
@@ -235,7 +244,7 @@ const AppointmentScreen = () => {
                     }}
                   />
                 </ConfirmDialog>
-              </XStack>
+              </YStack>
             )}
           </YStack>
         </Sheet.Frame>

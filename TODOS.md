@@ -24,5 +24,6 @@
 - [x] seriously consider going for RNUI lib | tamagui
 - [x] refactor appointment-form and client-user-list user-cards to a component
 - [x] refactor appointment-form and client-user-list form buttons to a component
-- [ ] refactor time picker to a component
+- [x] refactor time picker to a component
+- [x] scale the time picker so we can use it in our sheet
 - [ ] fix time picker to now allow picking non-working time
