@@ -3,11 +3,13 @@ import { isEmpty } from "lodash-es";
 import { useEffect } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Pressable, ScrollView } from "react-native";
-import { Button, Stack, XStack, YStack } from "tamagui";
+import { Stack, XStack, YStack } from "tamagui";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
+import { ActionButton } from "../components/action-button";
+import { BackdropSpinner } from "../components/backdrop-spinner";
 import ScreenContainer from "../components/screen-container";
 import TextFormInput from "../components/text-form-input";
 import { useMutateUsers, useUser } from "../queries/clients";
@@ -43,7 +45,7 @@ export default function ClientUserFormScreen() {
 
   useEffect(() => {
     if (id && existingUser && isEmpty(defaultValues)) {
-      methods.reset({ ...existingUser });
+      reset({ ...existingUser });
     }
   }, [id, existingUser]);
 
@@ -92,6 +94,7 @@ export default function ClientUserFormScreen() {
 
   return (
     <ScreenContainer>
+      <BackdropSpinner visible={isLoadingUpdate || isLoadingCreate} />
       <ScrollView>
         <FormProvider {...methods}>
           <YStack f={1} px="$4" gap="$2">
@@ -169,36 +172,33 @@ export default function ClientUserFormScreen() {
             />
           </YStack>
           <XStack jc="center" my="$4" gap="$4">
-            <Button
-              w="$10"
-              pressStyle={{ bg: "$secondarySoft" }}
-              color="$textSoft"
-              bg={
+            <ActionButton
+              label="Reset"
+              disabled={isLoadingCreate || isLoadingUpdate}
+              textColor="$textSoft"
+              backgroundColor={
                 isLoadingCreate || isLoadingUpdate
                   ? "$backgroundDisabled"
                   : "$backgroundSoft"
               }
-              disabled={isLoadingCreate || isLoadingUpdate}
-              onPress={() => reset()}>
-              Reset
-            </Button>
-            <Button
-              w="$10"
-              bg={
+              pressStyleBackground="$secondarySoft"
+              onPress={() => reset()}
+            />
+            <ActionButton
+              label="Confirm"
+              backgroundColor={
                 isLoadingCreate || isLoadingUpdate || !isValid
                   ? "$backgroundDisabled"
                   : "$primary"
               }
-              color={
+              textColor={
                 isLoadingCreate || isLoadingUpdate || !isValid
                   ? "$textDisabled"
                   : "$buttonText"
               }
-              pressStyle={{ bg: "$primarySoft" }}
+              onPress={handleSubmit(onSubmit)}
               disabled={isLoadingCreate || isLoadingUpdate || !isValid}
-              onPress={handleSubmit(onSubmit)}>
-              Confirm
-            </Button>
+            />
           </XStack>
         </FormProvider>
       </ScrollView>

@@ -6,7 +6,7 @@ import RNDateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
-import { Button, Paragraph, Stack, XStack, YStack } from "tamagui";
+import { Paragraph, Stack, XStack, YStack } from "tamagui";
 import ScreenContainer from "../components/screen-container";
 import { useMutateAppointments } from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
@@ -14,6 +14,8 @@ import { ClientUser } from "../shared/types/entities";
 import { HUMAN_DATE_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
 import { FlatList } from "react-native";
 import { ClientCard } from "../components/client-card";
+import { ActionButton } from "../components/action-button";
+import { BackdropSpinner } from "../components/backdrop-spinner";
 
 const now = new Date();
 
@@ -133,6 +135,7 @@ const NewAppointmentScreen = () => {
 
   return (
     <ScreenContainer>
+      <BackdropSpinner visible={isMutating} />
       <YStack mb="$4">
         <Paragraph
           size="$8"
@@ -196,34 +199,32 @@ const NewAppointmentScreen = () => {
           contentContainerStyle={{ paddingBottom: 200 }}
           ListFooterComponent={() => (
             <XStack alignSelf="center" gap="$4">
-              <Button
-                w="$10"
+              <ActionButton
                 onPress={() => setSelectedUsers([])}
-                pressStyle={{ bg: "$backgroundSoftActive" }}
+                pressStyleBackground="$backgroundSoftActive"
                 disabled={isMutating}
-                color="$textSoft"
-                bg={
+                textColor="$buttonText"
+                label="Reset"
+                backgroundColor={
                   isMutating ? "$backgroundDisabled" : "$backgroundSoft"
-                }>
-                Reset
-              </Button>
-              <Button
-                onPress={onConfirmPress}
-                w="$10"
+                }
+              />
+              <ActionButton
                 disabled={isMutating || selectedUsers.length === 0}
-                bg={
+                backgroundColor={
                   isMutating || selectedUsers.length === 0
                     ? "$backgroundDisabled"
                     : "$primary"
                 }
-                color={
+                textColor={
                   isMutating || selectedUsers.length === 0
                     ? "$textDisabled"
                     : "$buttonText"
                 }
-                pressStyle={{ bg: "$primarySoft" }}>
-                Confirm
-              </Button>
+                pressStyleBackground="$primarySoft"
+                onPress={onConfirmPress}
+                label="Confirm"
+              />
             </XStack>
           )}
         />
@@ -237,45 +238,6 @@ const NewAppointmentScreen = () => {
         />
       )}
     </ScreenContainer>
-    // <SafeAreaView>
-    //   <View>
-    //     <Pressable onPress={() => setTimeFor("date")}>
-    //       <Text>{format(selectedDate, HUMAN_DATE_FORMAT)}</Text>
-    //     </Pressable>
-    //   </View>
-    //   <View>
-    //     <Pressable disabled={isLoading} onPress={() => setTimeFor("from")}>
-    //       <Text>From</Text>
-    //       <Text>{timeFrom && format(timeFrom, "HH:mm")}</Text>
-    //     </Pressable>
-    //     <Pressable disabled={isLoading} onPress={() => setTimeFor("to")}>
-    //       <Text>To</Text>
-    //       <Text>{timeTo && format(timeTo, "HH:mm")}</Text>
-    //     </Pressable>
-    //   </View>
-    //   <FlatList
-    //     data={data?.clients}
-    //     renderItem={({ item: user }) => (
-    //       <Pressable onPress={() => toggleSelectedUser(user)}>
-    //         <View>
-    //           <Text>{user.firstName}</Text>
-    //           <Text>{user.lastName}</Text>
-    //         </View>
-    //         <Text>{user.email}</Text>
-    //       </Pressable>
-    //     )}
-    //     keyExtractor={item => item.id!}
-    //   />
-    //   <View>
-    //     {/* <PressableButton
-    //       label="Clear"
-    //       type="secondary"
-    //       onPress={() => setSelectedUsers([])}
-    //     />
-    //     <PressableButton label="Create" onPress={() => onConfirmPress()} /> */}
-    //   </View>
-
-    // </SafeAreaView>
   );
 };
 
