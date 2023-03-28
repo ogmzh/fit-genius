@@ -13,11 +13,19 @@
 - [x] change the query to fetch all the appointments for the month and make it a long lasting query
 - [x] reimplement create appointment screen
 - [x] fix a bug on appointment card time being AM/PM wrong
-- [ ] change user's appointment date
-- [ ] change user's appointment time
-- [ ] if i select an apppointment for which i already have users, select them
+- [x] change user's appointment date
+- [x] change user's appointment time
+- [ ] if i select an appointment for which i already have users, select them
+- [ ] if i mark a user that already has an appointment for that day, give a warning
 - [x] delete appointments
 - [ ] search users by name on the new appointment screen
+
+## Clients
+
+- [ ] add amount of workouts to the client
+- [ ] add a boolean to the client payment saying they want solo workouts
+- [ ] if we have an appointment taken by the solo user, prevent it from being picked
+  - [ ] make time picker to now allow picking non-working time also
 
 ## UI
 
@@ -26,4 +34,3 @@
 - [x] refactor appointment-form and client-user-list form buttons to a component
 - [x] refactor time picker to a component
 - [x] scale the time picker so we can use it in our sheet
-- [ ] fix time picker to now allow picking non-working time
