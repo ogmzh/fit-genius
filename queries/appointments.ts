@@ -19,7 +19,7 @@ import {
   ExtendedAppointmentRow,
   NewAppointment,
 } from "../shared/types/entities";
-import { SQL_DATE_FORMAT } from "../shared/utils";
+import { EVENT_TIME_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
 import { QUERY_KEYS } from ".";
 import { useTheme } from "tamagui";
 
@@ -27,12 +27,10 @@ type EventSchedule = {
   [date: string]: Event[];
 };
 
-const EVENT_TIME_FORMAT = "yyyy-MM-dd HH:mm";
-
 export const useAppointmentsData = (
   isFocused: boolean,
-  from?: Date,
-  to?: Date
+  from?: Date | null,
+  to?: Date | null
 ) => {
   const { client } = useSupabase();
   const { backgroundSoft } = useTheme();
@@ -67,21 +65,22 @@ export const useAppointmentsData = (
       }) => {
         const scheduleMapped: EventSchedule = appointments.reduce(
           (schedule, appointment) => {
-            const { day, clients, from, to, id } = appointment;
+            const { day, clients, from, to, id, client_id } = appointment;
             const formatDateTime = (time: string) =>
               format(parseISO(`${day}T${time}`), EVENT_TIME_FORMAT);
             if (clients) {
+              const eventId = `{"appointment_id":"${id}", "client_id":"${client_id}"}`;
               if (schedule[day]) {
                 Array.isArray(clients)
                   ? schedule[day].push({
-                      id,
+                      id: eventId,
                       title: `${clients[0].first_name} ${clients[0].last_name}`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
                       color: "red",
                     })
                   : schedule[day].push({
-                      id,
+                      id: eventId,
                       title: `${clients.first_name} ${clients.last_name}`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
@@ -91,7 +90,7 @@ export const useAppointmentsData = (
                 schedule[day] = Array.isArray(clients)
                   ? [
                       {
-                        id,
+                        id: eventId,
                         title: `${clients[0].first_name} ${clients[0].last_name}`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
@@ -100,7 +99,7 @@ export const useAppointmentsData = (
                     ]
                   : [
                       {
-                        id,
+                        id: eventId,
                         title: `${clients.first_name} ${clients.last_name}`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
@@ -115,7 +114,7 @@ export const useAppointmentsData = (
         );
         return scheduleMapped;
       },
-      enabled: !!from && !!to && isFocused,
+      enabled: !!from && isFocused,
     }
   );
   return { data, isLoading, isStale };
@@ -129,6 +128,14 @@ export const useMutateAppointments = () => {
     [QUERY_KEYS.appointments],
     async (data: NewAppointment) => {
       const { clientIds, day, from, to } = data;
+      await client
+        ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
+          DatabaseTables.APPOINTMENTS
+        )
+        .delete()
+        .eq("day", day)
+        .eq("from", formatInTimeZone(from, "UTC", "HH:mmX"))
+        .eq("to", formatInTimeZone(to, "UTC", "HH:mmX"));
       const response = await client
         ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
           DatabaseTables.APPOINTMENTS
@@ -178,7 +185,7 @@ export const useMutateAppointments = () => {
           from: formatInTimeZone(from, "UTC", "HH:mmX"),
           to: formatInTimeZone(to, "UTC", "HH:mmX"),
         })
-        .eq("id", id);
+        .eq("id", JSON.parse(id).appointment_id);
       return {
         status: response?.status,
         statusText: response?.statusText,

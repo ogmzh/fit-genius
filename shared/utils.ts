@@ -3,6 +3,7 @@ import { formatISO } from "date-fns";
 import { ClientRow } from "./types/database";
 import { ClientUserSchema } from "./validation/client";
 
+export const EVENT_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 export const HUMAN_DATE_FORMAT = "MMM dd. yyyy";
 export const SQL_DATE_FORMAT = "yyyy-MM-dd";
 export const TIME_FORMAT = "HH:mm";

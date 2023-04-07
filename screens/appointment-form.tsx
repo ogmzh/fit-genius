@@ -1,18 +1,22 @@
-import { addHours, format } from "date-fns";
+import { addHours, format, parseISO } from "date-fns";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 
 import { XStack, YStack } from "tamagui";
 import ScreenContainer from "../components/screen-container";
-import { useMutateAppointments } from "../queries/appointments";
+import {
+  useAppointmentsData,
+  useMutateAppointments,
+} from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
 import { ClientUser } from "../shared/types/entities";
-import { SQL_DATE_FORMAT } from "../shared/utils";
+import { EVENT_TIME_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
 import { FlatList } from "react-native";
 import { ClientCard } from "../components/client-card";
 import { ActionButton } from "../components/action-button";
 import { BackdropSpinner } from "../components/backdrop-spinner";
 import { AppointmentPicker } from "../components/appointment-picker";
+import { useIsFocused } from "@react-navigation/native";
 
 const now = new Date();
 
@@ -22,6 +26,8 @@ const NewAppointmentScreen = () => {
     from: queryFrom,
     to: queryTo,
   } = useLocalSearchParams<{ date: string; from: string; to: string }>();
+
+  const isFocused = useIsFocused();
 
   const [timeFrom, setTimeFrom] = useState<Date | null>();
   const [timeTo, setTimeTo] = useState<Date | null>();
@@ -35,8 +41,39 @@ const NewAppointmentScreen = () => {
   const { appointment: id } = useLocalSearchParams<{
     appointment: string;
   }>();
+  const { data: todayAppointments } = useAppointmentsData(
+    isFocused,
+    selectedDate,
+    selectedDate
+  );
+  const { data: clientData } = useUsersData();
 
-  const { data } = useUsersData();
+  useEffect(() => {
+    if (todayAppointments && timeFrom && timeTo) {
+      // preselects users that have already been appointed to the selected slot
+      const todayAppointment =
+        todayAppointments[format(selectedDate, SQL_DATE_FORMAT)];
+      if (todayAppointment) {
+        const existingAppointments = todayAppointment.filter(
+          appointment =>
+            appointment.start === format(timeFrom, EVENT_TIME_FORMAT) &&
+            appointment.end === format(timeTo, EVENT_TIME_FORMAT)
+        );
+        const existingUserIds = new Set(
+          existingAppointments.map(
+            appointment => JSON.parse(appointment.id!).client_id
+          )
+        );
+
+        setSelectedUsers(
+          clientData?.clients.filter(user =>
+            existingUserIds.has(user.id)
+          ) ?? []
+        );
+      }
+    }
+  }, [todayAppointments, timeFrom, timeTo]);
+
   const { createAppointmentAsync, isLoading: isMutating } =
     useMutateAppointments();
 
@@ -104,7 +141,7 @@ const NewAppointmentScreen = () => {
           disabled={isMutating}
         />
         <FlatList
-          data={data?.clients}
+          data={clientData?.clients}
           renderItem={({ item: user }) => (
             <ClientCard
               firstName={user.firstName}
