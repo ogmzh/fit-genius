@@ -175,13 +175,13 @@ export default function ClientUserFormScreen() {
             <ActionButton
               label="Reset"
               disabled={isLoadingCreate || isLoadingUpdate}
-              textColor="$textSoft"
+              textColor="$text"
               backgroundColor={
                 isLoadingCreate || isLoadingUpdate
                   ? "$backgroundDisabled"
                   : "$backgroundSoft"
               }
-              pressStyleBackground="$secondarySoft"
+              pressStyleBackground="$backgroundSoftActive"
               onPress={() => reset()}
             />
             <ActionButton
@@ -196,6 +196,7 @@ export default function ClientUserFormScreen() {
                   ? "$textDisabled"
                   : "$text"
               }
+              pressStyleBackground="$primaryActive"
               onPress={handleSubmit(onSubmit)}
               disabled={isLoadingCreate || isLoadingUpdate || !isValid}
             />
