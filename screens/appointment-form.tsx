@@ -46,7 +46,7 @@ const NewAppointmentScreen = () => {
   const { appointment: id } = useLocalSearchParams<{
     appointment: string;
   }>();
-  const { data: todayAppointments } = useAppointmentsData(
+  const { data: selectedDayAppointments } = useAppointmentsData(
     isFocused,
     selectedDate,
     selectedDate
@@ -63,12 +63,12 @@ const NewAppointmentScreen = () => {
   });
 
   useEffect(() => {
-    if (todayAppointments && timeFrom && timeTo) {
+    if (selectedDayAppointments && timeFrom && timeTo) {
       // preselects users that have already been appointed to the selected slot
-      const todayAppointment =
-        todayAppointments[format(selectedDate, SQL_DATE_FORMAT)];
-      if (todayAppointment) {
-        const existingAppointments = todayAppointment.filter(
+      const selectedDayAppointment =
+        selectedDayAppointments[format(selectedDate, SQL_DATE_FORMAT)];
+      if (selectedDayAppointment) {
+        const existingAppointments = selectedDayAppointment.filter(
           appointment =>
             appointment.start === format(timeFrom, EVENT_TIME_FORMAT) &&
             appointment.end === format(timeTo, EVENT_TIME_FORMAT)
@@ -85,8 +85,10 @@ const NewAppointmentScreen = () => {
           ) ?? []
         );
       }
+    } else {
+      setSelectedUsers([]);
     }
-  }, [todayAppointments, timeFrom, timeTo]);
+  }, [selectedDayAppointments, timeFrom, timeTo]);
 
   const { createAppointmentAsync, isLoading: isMutating } =
     useMutateAppointments();
@@ -139,7 +141,7 @@ const NewAppointmentScreen = () => {
       });
       addListener("beforeRemove", () => {
         const todayAppointment =
-          todayAppointments?.[format(selectedDate, SQL_DATE_FORMAT)];
+          selectedDayAppointments?.[format(selectedDate, SQL_DATE_FORMAT)];
 
         if (todayAppointment) {
           const appointedUserIds = new Set(
@@ -175,7 +177,7 @@ const NewAppointmentScreen = () => {
   return (
     <ScreenContainer>
       <BackdropSpinner visible={isMutating} />
-      <YStack mb="$4">
+      <YStack mb="$12">
         <AppointmentPicker
           date={selectedDate}
           onDateChange={setSelectedDate}

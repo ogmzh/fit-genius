@@ -195,6 +195,7 @@ const AppointmentScreen = () => {
         {appointments && (
           <TimelineList
             events={appointments}
+            scrollToFirst
             scrollToNow
             showNowIndicator
             timelineProps={{
