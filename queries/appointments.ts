@@ -185,7 +185,7 @@ export const useMutateAppointments = () => {
           from: formatInTimeZone(from, "UTC", "HH:mmX"),
           to: formatInTimeZone(to, "UTC", "HH:mmX"),
         })
-        .eq("id", JSON.parse(id).appointment_id);
+        .eq("id", id);
       return {
         status: response?.status,
         statusText: response?.statusText,

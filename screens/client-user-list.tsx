@@ -53,10 +53,10 @@ export function ClientUserListScreen() {
                     circular
                     size="$3"
                     icon={Trash}
-                    backgroundColor="$warning"
+                    backgroundColor="$danger"
                     color="white"
                     pressStyle={{
-                      bg: "$danger",
+                      bg: "$error",
                     }}
                   />
                 </ConfirmDialog>

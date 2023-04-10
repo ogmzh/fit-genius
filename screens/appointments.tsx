@@ -57,9 +57,8 @@ const newAppointmentQueryDateString = (
   selectedDay: string,
   withHours = false
 ) => {
-  // silly library doesn't pass hours as time but how many hours have passed since the start of the workday
   const selected = withHours
-    ? addHours(new Date(selectedDay), START_TIME)
+    ? new Date(selectedDay)
     : setHours(new Date(selectedDay), getHours(now) + 1);
   const nextTimeslot =
     selected.getMinutes() === 0
@@ -95,7 +94,14 @@ const AppointmentScreen = () => {
     updateAppointmentAsync,
   } = useMutateAppointments();
 
-  const { background, secondary, text, textSoft, accent } = useTheme();
+  const {
+    background,
+    backgroundDisabled,
+    secondary,
+    text,
+    textSoft,
+    accent,
+  } = useTheme();
 
   const { push } = useRouter();
 
@@ -132,7 +138,7 @@ const AppointmentScreen = () => {
   const handleConfirmAppointmentChange = async () => {
     if (selectedEvent && updatedEventTime) {
       await updateAppointmentAsync({
-        id: selectedEvent.id!,
+        id: JSON.parse(selectedEvent.id!).appointment_id,
         date: updatedEventTime.date,
         from: updatedEventTime.from,
         to: updatedEventTime.to,
@@ -207,10 +213,22 @@ const AppointmentScreen = () => {
                     true
                   )}`
                 ),
-              start: START_TIME,
-              end: 23,
+              // if we use start/end props instead of unavailable hours,
+              // the NOW line gets offset for however many hours se set as START_TIME x(
+              unavailableHours: [
+                {
+                  start: 0,
+                  end: START_TIME,
+                },
+                {
+                  start: 22,
+                  end: 24,
+                },
+              ],
+              unavailableHoursColor: backgroundDisabled.val,
               format24h: true,
               overlapEventsSpacing: 5,
+              date: selectedDate,
               theme: {
                 ...theme,
                 // event background is coming from the appointments entity
@@ -240,16 +258,16 @@ const AppointmentScreen = () => {
       />
       <Sheet
         open={!!selectedEvent}
-        snapPoints={[20, 41, 55]}
+        snapPoints={[41, 55]}
         position={
           isDeleting || isUpdating ? 0 : showTimepickerControls ? 2 : 1
         }
         dismissOnSnapToBottom
         dismissOnOverlayPress
         onOpenChange={() => setSelectedEvent(null)}>
-        <Sheet.Overlay />
-        <Sheet.Handle />
-        <Sheet.Frame f={1} p="$4" space="$5">
+        <Sheet.Overlay bg="$backgroundSoft" />
+        <Sheet.Handle bg="$primary" />
+        <Sheet.Frame f={1} p="$4" space="$5" borderTopColor="red">
           <YStack>
             {selectedEvent && (
               <XStack ai="center" jc="space-between">
@@ -350,7 +368,9 @@ const AppointmentScreen = () => {
                     title="Delete"
                     onConfirm={async () => {
                       if (selectedEvent?.id) {
-                        await deleteAppointmentAsync(selectedEvent.id);
+                        await deleteAppointmentAsync(
+                          JSON.parse(selectedEvent.id!).appointment_id
+                        );
                         setSelectedEvent(null);
                       }
                     }}

@@ -3,9 +3,10 @@ import { AlertDialog, Spinner } from "tamagui";
 export const BackdropSpinner = ({ visible }: { visible: boolean }) => {
   return (
     <AlertDialog open={visible}>
-      <AlertDialog.Portal>
+      <AlertDialog.Portal zIndex={999}>
         <AlertDialog.Overlay
           key="overlay"
+          zIndex={999}
           animation="quick"
           o={0.5}
           enterStyle={{ o: 0 }}
@@ -14,6 +15,7 @@ export const BackdropSpinner = ({ visible }: { visible: boolean }) => {
         <AlertDialog.Content
           bordered
           elevate
+          zIndex={999}
           bw={0}
           backgroundColor="$backgroundTransparent"
           key="content"
@@ -31,7 +33,7 @@ export const BackdropSpinner = ({ visible }: { visible: boolean }) => {
           scale={1}
           opacity={1}
           y={0}>
-          <Spinner size="large" />
+          <Spinner size="large" zIndex={999} />
         </AlertDialog.Content>
       </AlertDialog.Portal>
     </AlertDialog>

@@ -30,7 +30,7 @@ const bodyFont = createInterFont();
 
 const darkTheme = {
   primary: "#DB774A",
-  primarySoft: "#e0b09b",
+  primaryActive: "#e68a60",
   secondary: "#525FEA",
   secondarySoft: "#6369b0",
   accent: "#0FF1A5",
@@ -39,7 +39,6 @@ const darkTheme = {
   backgroundSoft: "#343752",
   backgroundSoftActive: "#3e415e",
   backgroundDisabled: "#969595",
-  buttonText: "#f8f9fa",
   text: "#f8f9fa",
   textSoft: "#ababab",
   textDisabled: "#ababab",
@@ -51,19 +50,18 @@ const darkTheme = {
 };
 
 const lightTheme = {
-  primary: "#DB774A",
-  primarySoft: "#e0b09b",
+  primary: "#f28250",
+  primaryActive: "#c26034",
   secondary: "#525FEA",
   secondarySoft: "#6369b0",
   accent: "#0dd692",
-  accentActive: "#129468",
+  accentActive: "#0bb078",
   background: "#FFFFFF",
-  backgroundSoft: "#e5e5e5",
+  backgroundSoft: "#f3f3f3",
   backgroundSoftActive: "#dbdbdb",
   backgroundDisabled: "#ededed",
-  buttonText: "#f8f9fa",
-  text: "#210a40",
-  textSoft: "#44325c",
+  text: "#0c021a",
+  textSoft: "#210a40",
   textDisabled: "#d0d0d0",
   info: "#93a7ed",
   warning: "#E86150",

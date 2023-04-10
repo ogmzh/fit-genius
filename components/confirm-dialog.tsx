@@ -63,6 +63,7 @@ export const ConfirmDialog = ({
               {!hideCancel && (
                 <AlertDialog.Cancel asChild>
                   <Button
+                    bg="$backgroundSoft"
                     color="$textSoft"
                     onPress={onCancel && (() => onCancel())}>
                     {cancelText}

@@ -194,7 +194,7 @@ export default function ClientUserFormScreen() {
               textColor={
                 isLoadingCreate || isLoadingUpdate || !isValid
                   ? "$textDisabled"
-                  : "$buttonText"
+                  : "$text"
               }
               onPress={handleSubmit(onSubmit)}
               disabled={isLoadingCreate || isLoadingUpdate || !isValid}

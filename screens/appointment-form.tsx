@@ -1,22 +1,25 @@
-import { addHours, format, parseISO } from "date-fns";
+import { addHours, format } from "date-fns";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { FlatList } from "react-native";
+import Toast from "react-native-toast-message";
+import { XStack, YStack, useTheme } from "tamagui";
 
-import { XStack, YStack } from "tamagui";
+import { useIsFocused } from "@react-navigation/native";
+
+import { ActionButton } from "../components/action-button";
+import { AppointmentPicker } from "../components/appointment-picker";
+import { BackdropSpinner } from "../components/backdrop-spinner";
+import { ClientCard } from "../components/client-card";
 import ScreenContainer from "../components/screen-container";
 import {
   useAppointmentsData,
   useMutateAppointments,
 } from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
+import { toastWarningStyleProps } from "../shared/toast";
 import { ClientUser } from "../shared/types/entities";
 import { EVENT_TIME_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
-import { FlatList } from "react-native";
-import { ClientCard } from "../components/client-card";
-import { ActionButton } from "../components/action-button";
-import { BackdropSpinner } from "../components/backdrop-spinner";
-import { AppointmentPicker } from "../components/appointment-picker";
-import { useIsFocused } from "@react-navigation/native";
 
 const now = new Date();
 
@@ -27,15 +30,15 @@ const NewAppointmentScreen = () => {
     to: queryTo,
   } = useLocalSearchParams<{ date: string; from: string; to: string }>();
 
-  const isFocused = useIsFocused();
-
   const [timeFrom, setTimeFrom] = useState<Date | null>();
   const [timeTo, setTimeTo] = useState<Date | null>();
   const [selectedDate, setSelectedDate] = useState<Date>(
     queryDate ? new Date(queryDate) : now
   );
-
   const [selectedUsers, setSelectedUsers] = useState<ClientUser[]>([]);
+
+  const isFocused = useIsFocused();
+  const theme = useTheme();
 
   //TODO: figure out what did i want to do with this ID
   const { appointment: id } = useLocalSearchParams<{
@@ -103,7 +106,7 @@ const NewAppointmentScreen = () => {
     }
   }, [timeFrom]);
 
-  const { canGoBack, goBack } = useNavigation();
+  const { canGoBack, goBack, addListener } = useNavigation();
 
   const toggleSelectedUser = (user: ClientUser) => {
     if (selectedUsers.some(selectedUser => selectedUser.id === user.id)) {
@@ -122,6 +125,37 @@ const NewAppointmentScreen = () => {
         day: format(selectedDate, SQL_DATE_FORMAT),
         from: timeFrom,
         to: timeTo,
+      });
+      addListener("beforeRemove", () => {
+        const todayAppointment =
+          todayAppointments?.[format(selectedDate, SQL_DATE_FORMAT)];
+
+        if (todayAppointment) {
+          const appointedUserIds = new Set(
+            todayAppointment
+              .filter(
+                appointment =>
+                  appointment.start !== format(timeFrom, EVENT_TIME_FORMAT)
+              )
+              .map(appointment => JSON.parse(appointment.id!).client_id)
+          );
+          const duplicatedAppointments = selectedUsers.filter(user =>
+            appointedUserIds.has(user.id)
+          );
+          if (duplicatedAppointments.length > 0) {
+            Toast.show({
+              type: "styled",
+              props: toastWarningStyleProps(theme),
+              text1: "Multiple appointments",
+              visibilityTime: 7000,
+              text2:
+                duplicatedAppointments.length > 1 &&
+                selectedUsers.length > 1
+                  ? `${duplicatedAppointments[0].firstName} ${duplicatedAppointments[0].lastName} and others...`
+                  : `${duplicatedAppointments[0].firstName} ${duplicatedAppointments[0].lastName}`,
+            });
+          }
+        }
       });
       canGoBack() && goBack();
     }
@@ -161,7 +195,7 @@ const NewAppointmentScreen = () => {
                 onPress={() => setSelectedUsers([])}
                 pressStyleBackground="$backgroundSoftActive"
                 disabled={isMutating}
-                textColor="$buttonText"
+                textColor="$text"
                 label="Reset"
                 backgroundColor={
                   isMutating ? "$backgroundDisabled" : "$backgroundSoft"
@@ -177,9 +211,9 @@ const NewAppointmentScreen = () => {
                 textColor={
                   isMutating || selectedUsers.length === 0
                     ? "$textDisabled"
-                    : "$buttonText"
+                    : "$text"
                 }
-                pressStyleBackground="$primarySoft"
+                pressStyleBackground="$primaryActive"
                 onPress={onConfirmPress}
                 label="Confirm"
               />
