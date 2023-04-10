@@ -16,9 +16,9 @@
 - [x] change user's appointment date
 - [x] change user's appointment time
 - [x] if i select an appointment for which i already have users, select them
-- [ ] if i mark a user that already has an appointment for that day, give a warning
+- [x] if i mark a user that already has an appointment for that day, give a warning
 - [x] delete appointments
-- [ ] search users by name on the new appointment screen
+- [x] search users by name on the new appointment screen
 
 ## Client profiles
 

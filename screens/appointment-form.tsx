@@ -20,6 +20,8 @@ import { useUsersData } from "../queries/clients";
 import { toastWarningStyleProps } from "../shared/toast";
 import { ClientUser } from "../shared/types/entities";
 import { EVENT_TIME_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
+import { DebouncedInput } from "../components/debounced-input";
+import useSearch from "../shared/hooks/use-search";
 
 const now = new Date();
 
@@ -50,6 +52,15 @@ const NewAppointmentScreen = () => {
     selectedDate
   );
   const { data: clientData } = useUsersData();
+
+  const {
+    results: filteredClients,
+    searchQuery,
+    search,
+  } = useSearch<ClientUser>({
+    data: clientData?.clients ?? [],
+    keys: ["firstName", "lastName", "email"],
+  });
 
   useEffect(() => {
     if (todayAppointments && timeFrom && timeTo) {
@@ -174,8 +185,19 @@ const NewAppointmentScreen = () => {
           onTimeToChange={setTimeTo}
           disabled={isMutating}
         />
+        <DebouncedInput
+          containerProps={{
+            mb: "$4",
+            mx: "$6",
+          }}
+          inputProps={{
+            placeholder: "Search...",
+          }}
+          value={searchQuery}
+          onValueChange={value => search(value)}
+        />
         <FlatList
-          data={clientData?.clients}
+          data={filteredClients}
           renderItem={({ item: user }) => (
             <ClientCard
               firstName={user.firstName}

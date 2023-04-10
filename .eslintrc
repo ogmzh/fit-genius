@@ -36,6 +36,9 @@
           "acc": {
             "accumulator": false
           },
+          "fn": {
+            "function": false
+          },
           "props": {
             "properties": false
           },
