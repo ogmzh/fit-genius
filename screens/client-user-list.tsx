@@ -11,9 +11,24 @@ import { FloatingActionButton } from "../components/floating-action-button";
 import ScreenContainer from "../components/screen-container";
 import { QUERY_KEYS } from "../queries";
 import { useMutateUsers, useUsersData } from "../queries/clients";
+import { DebouncedInput } from "../components/debounced-input";
+import { useState } from "react";
+import useSearch from "../shared/hooks/use-search";
+import { ClientUser } from "../shared/types/entities";
 
 export function ClientUserListScreen() {
+  const [searchValue, setSearchValue] = useState("");
+
   const { data, isLoading, isStale } = useUsersData();
+
+  const {
+    results: filteredClients,
+    searchQuery,
+    search,
+  } = useSearch<ClientUser>({
+    data: data?.clients ?? [],
+    keys: ["firstName", "lastName", "email"],
+  });
 
   const queryClient = useQueryClient();
   const { delete: deleteUser } = useMutateUsers();
@@ -25,44 +40,57 @@ export function ClientUserListScreen() {
         {isLoading ? (
           <Spinner size="large" color="$secondary" />
         ) : (
-          <FlatList
-            style={{ width: "100%" }}
-            data={data?.clients}
-            keyExtractor={item => item.id!}
-            renderItem={({ item }) => (
-              <ClientCard
-                key={item.id}
-                firstName={item.firstName}
-                lastName={item.lastName}
-                email={item.email}
-                onPress={() => {
-                  // preload query data if it's not stale
-                  // so we don't have to unnecessarily (p)refetch
-                  !isStale &&
-                    queryClient.setQueryData(
-                      [QUERY_KEYS.clients, item.id],
-                      item
-                    );
-                  push(`clients/${item.id}`);
-                }}>
-                <ConfirmDialog
-                  title="Delete"
-                  onConfirm={() => item.id && deleteUser(item.id)}
-                  description={`Are you sure you want to delete user ${item.firstName} ${item.lastName}?`}>
-                  <Button
-                    circular
-                    size="$3"
-                    icon={Trash}
-                    backgroundColor="$danger"
-                    color="white"
-                    pressStyle={{
-                      bg: "$error",
-                    }}
-                  />
-                </ConfirmDialog>
-              </ClientCard>
-            )}
-          />
+          <>
+            <DebouncedInput
+              containerProps={{
+                mb: "$4",
+                mx: "$6",
+              }}
+              inputProps={{
+                placeholder: "Search...",
+              }}
+              value={searchQuery}
+              onValueChange={value => search(value)}
+            />
+            <FlatList
+              style={{ width: "100%" }}
+              data={filteredClients}
+              keyExtractor={item => item.id!}
+              renderItem={({ item }) => (
+                <ClientCard
+                  key={item.id}
+                  firstName={item.firstName}
+                  lastName={item.lastName}
+                  email={item.email}
+                  onPress={() => {
+                    // preload query data if it's not stale
+                    // so we don't have to unnecessarily (p)refetch
+                    !isStale &&
+                      queryClient.setQueryData(
+                        [QUERY_KEYS.clients, item.id],
+                        item
+                      );
+                    push(`clients/${item.id}`);
+                  }}>
+                  <ConfirmDialog
+                    title="Delete"
+                    onConfirm={() => item.id && deleteUser(item.id)}
+                    description={`Are you sure you want to delete user ${item.firstName} ${item.lastName}?`}>
+                    <Button
+                      circular
+                      size="$3"
+                      icon={Trash}
+                      backgroundColor="$danger"
+                      color="white"
+                      pressStyle={{
+                        bg: "$error",
+                      }}
+                    />
+                  </ConfirmDialog>
+                </ClientCard>
+              )}
+            />
+          </>
         )}
         <FloatingActionButton onPress={() => push("clients/new")} />
       </YStack>

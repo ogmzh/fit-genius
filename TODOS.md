@@ -19,6 +19,7 @@
 - [x] if i mark a user that already has an appointment for that day, give a warning
 - [x] delete appointments
 - [x] search users by name on the new appointment screen
+- [x] search users by name on the client list screen
 
 ## Client profiles
 
