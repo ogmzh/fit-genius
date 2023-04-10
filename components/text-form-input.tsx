@@ -51,6 +51,10 @@ const TextFormInput = <T extends FieldValues>({
         )}
       </XStack>
       <Input
+        bg="$backgroundSoft"
+        placeholderTextColor="$textSofter"
+        borderColor="$backgroundSoftActive"
+        borderWidth="$0.5"
         editable={!disabled}
         keyboardType={keyboardType}
         numberOfLines={numberOfLines}

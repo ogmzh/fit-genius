@@ -39,12 +39,15 @@ export const DebouncedInput = ({
   return (
     <XStack
       ai="center"
-      borderColor="$backgroundSoft"
+      borderColor="$backgroundSoftActive"
+      bg="$backgroundSoft"
       borderRadius="$4"
-      borderWidth="$1"
+      borderWidth="$0.5"
       pr="$2"
       {...containerProps}>
       <Input
+        placeholderTextColor="$textSofter"
+        bg="$backgroundSoft"
         value={innerValue}
         onChangeText={setInnerValue}
         clearButtonMode="always"
