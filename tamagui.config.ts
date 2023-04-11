@@ -23,6 +23,12 @@ const animations = createAnimations({
     mass: 1.2,
     stiffness: 250,
   },
+  smooth: {
+    type: "spring",
+    damping: 50,
+    mass: 0.2,
+    stiffness: 700,
+  },
 });
 
 const headingFont = createInterFont();
