@@ -23,6 +23,8 @@
 
 ## Client profiles
 
+- [x] tabbed header component
+- [x] make tabbed header component show only for an existing user
 - [ ] add amount of workouts to the client
 - [ ] add a boolean to the client payment saying they want solo workouts
 - [ ] if we have an appointment taken by the solo user, prevent it from being picked
@@ -36,3 +38,7 @@
 - [x] refactor appointment-form and client-user-list form buttons to a component
 - [x] refactor time picker to a component
 - [x] scale the time picker so we can use it in our sheet
+
+## Components
+
+- [x] sheet to reusable component with multiple snap points

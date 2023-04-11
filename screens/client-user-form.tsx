@@ -128,7 +128,7 @@ export default function ClientUserFormScreen() {
                   name="height"
                   label="Height"
                   keyboardType="numeric"
-                  placeholder="174 cm"
+                  placeholder="cm"
                 />
               </Stack>
               <Stack f={1}>
@@ -136,7 +136,7 @@ export default function ClientUserFormScreen() {
                   name="weight"
                   label="Weight"
                   keyboardType="numeric"
-                  placeholder="71 kg"
+                  placeholder="kg"
                 />
               </Stack>
             </XStack>
