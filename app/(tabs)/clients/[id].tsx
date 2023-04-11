@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { XStack, YStack } from "tamagui";
 
 import ScreenContainer from "../../../components/screen-container";
 import { TabbedControlHeader } from "../../../components/tabbed-control-header";
 import ClientUserFormScreen from "../../../screens/client-user-form";
 import { SelectOption, TabState } from "../../../shared/types/utils";
+import { Payments } from "../../../screens/payments";
+import { Measurements } from "../../../screens/measurements";
 
 const TABS: SelectOption[] = [
   { label: "Profile", value: "profile" },
@@ -15,7 +16,7 @@ const TABS: SelectOption[] = [
 const ClientUserById = () => {
   const [tabState, setTabState] = useState<TabState>({
     activeAt: null,
-    currentTab: TABS[0],
+    currentTab: TABS[1],
     intentAt: null,
     prevActiveAt: null,
   });
@@ -29,6 +30,8 @@ const ClientUserById = () => {
         {tabState.currentTab.value === "profile" && (
           <ClientUserFormScreen />
         )}
+        {tabState.currentTab.value === "payments" && <Payments />}
+        {tabState.currentTab.value === "measurements" && <Measurements />}
       </TabbedControlHeader>
     </ScreenContainer>
   );

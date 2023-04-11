@@ -2,8 +2,8 @@ import { Sheet } from "tamagui";
 
 type Props = {
   open: boolean;
-  snapPoints: number[];
-  position: number;
+  snapPoints?: number[];
+  position?: number;
   handleDismiss: () => void;
   children: React.ReactNode;
   hideDragHandle?: boolean;
@@ -11,8 +11,8 @@ type Props = {
 
 export const BottomSheet = ({
   open,
-  snapPoints,
-  position,
+  snapPoints = [40],
+  position = 0,
   handleDismiss,
   children,
   hideDragHandle,

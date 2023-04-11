@@ -16,19 +16,11 @@ import {
   TimelineList,
 } from "react-native-calendars";
 import { DateData, MarkedDates } from "react-native-calendars/src/types";
-import {
-  AnimatePresence,
-  Button,
-  Paragraph,
-  Spinner,
-  XStack,
-  YStack,
-  useTheme,
-} from "tamagui";
+import { Button, H4, Spinner, XStack, YStack, useTheme } from "tamagui";
 
 import { useIsFocused } from "@react-navigation/native";
 
-import { Check, Trash, X } from "@tamagui/lucide-icons";
+import { Trash } from "@tamagui/lucide-icons";
 import { AppointmentPicker } from "../components/appointment-picker";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { FloatingActionButton } from "../components/floating-action-button";
@@ -43,7 +35,8 @@ import {
   TIME_FORMAT,
 } from "../shared/utils";
 import { isEqual } from "lodash-es";
-import { BottomSheet } from "../components/bottom-sheet";
+import { BottomSheet } from "../components/sheet/bottom-sheet";
+import { SheetControls } from "../components/sheet/sheet-controls";
 
 const START_TIME = 7;
 
@@ -264,16 +257,14 @@ const AppointmentScreen = () => {
           isDeleting || isUpdating ? 0 : showTimepickerControls ? 2 : 1
         }
         handleDismiss={() => setSelectedEvent(null)}>
-        <YStack>
+        <YStack ai="center">
           {selectedEvent && (
             <XStack ai="center" jc="space-between">
-              <Paragraph size="$6" fow="bold">
-                {selectedEvent.title}
-              </Paragraph>
+              <H4>{selectedEvent.title}</H4>
             </XStack>
           )}
           {isDeleting || isUpdating ? (
-            <Spinner size="large" />
+            <Spinner size="large" mt="$5" />
           ) : (
             <YStack mt="$4">
               <YStack w="$15" alignSelf="center">
@@ -317,47 +308,12 @@ const AppointmentScreen = () => {
                   timeFrom={updatedEventTime?.from ?? new Date()}
                   timeTo={updatedEventTime?.to ?? new Date()}
                 />
-                <AnimatePresence>
-                  {showTimepickerControls && (
-                    <XStack
-                      key="controls"
-                      gap="$4"
-                      jc="center"
-                      enterStyle={{
-                        scale: 1.2,
-                        opacity: 0,
-                      }}
-                      exitStyle={{
-                        scale: 1.2,
-                        opacity: 0,
-                      }}
-                      opacity={1}
-                      scale={1}
-                      y={0}
-                      elevation="$4"
-                      animation="lazy">
-                      <Button
-                        circular
-                        onPress={() => handleConfirmAppointmentChange()}
-                        icon={Check}
-                        bg="$accent"
-                        color="white"
-                        scaleIcon={1.8}
-                      />
-                      <Button
-                        circular
-                        icon={X}
-                        onPress={() => handleCloseSheet()}
-                        bg="$warning"
-                        pressStyle={{
-                          bg: "$error",
-                        }}
-                        color="white"
-                        scaleIcon={1.8}
-                      />
-                    </XStack>
-                  )}
-                </AnimatePresence>
+                {showTimepickerControls && (
+                  <SheetControls
+                    handleCancel={handleCloseSheet}
+                    handleConfirm={handleConfirmAppointmentChange}
+                  />
+                )}
               </YStack>
               <XStack mt="$9">
                 <ConfirmDialog
