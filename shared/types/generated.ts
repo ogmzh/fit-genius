@@ -12,7 +12,7 @@ export interface Database {
       appointments: {
         Row: {
           client_id: string
-          created_at: string | null
+          created_at: string
           day: string
           from: string
           id: string
@@ -20,7 +20,7 @@ export interface Database {
         }
         Insert: {
           client_id: string
-          created_at?: string | null
+          created_at?: string
           day: string
           from: string
           id?: string
@@ -28,7 +28,7 @@ export interface Database {
         }
         Update: {
           client_id?: string
-          created_at?: string | null
+          created_at?: string
           day?: string
           from?: string
           id?: string
@@ -48,6 +48,8 @@ export interface Database {
           notes: string | null
           phone_number: string | null
           weight: number | null
+          workouts_group: number | null
+          workouts_solo: number | null
         }
         Insert: {
           created_at?: string
@@ -61,6 +63,8 @@ export interface Database {
           notes?: string | null
           phone_number?: string | null
           weight?: number | null
+          workouts_group?: number | null
+          workouts_solo?: number | null
         }
         Update: {
           created_at?: string
@@ -74,6 +78,31 @@ export interface Database {
           notes?: string | null
           phone_number?: string | null
           weight?: number | null
+          workouts_group?: number | null
+          workouts_solo?: number | null
+        }
+      }
+      payments: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          is_solo: boolean
+          workouts: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          is_solo?: boolean
+          workouts: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          is_solo?: boolean
+          workouts?: number
         }
       }
     }

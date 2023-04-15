@@ -6,13 +6,13 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "update-types": "npx supabase gen types typescript --project-id \"rqavyroelmtspuxnybsz\" > app/shared/types/generated.ts"
+    "update-types": "npx supabase gen types typescript --project-id \"rqavyroelmtspuxnybsz\" > shared/types/generated.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-native-community/datetimepicker": "^7.0.0",
-    "@supabase/supabase-js": "^2.10.0",
+    "@supabase/supabase-js": "^2.20.0",
     "@tamagui/animations-react-native": "^1.13.4",
     "@tamagui/babel-plugin": "^1.13.4",
     "@tamagui/config": "^1.13.4",

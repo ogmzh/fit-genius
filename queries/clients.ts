@@ -77,6 +77,7 @@ export const useUser = (id?: string) => {
   >(
     [QUERY_KEYS.clients, id],
     async () => {
+      console.log("fetching user by id", id);
       const response = await clientQuery;
       return response?.data?.[0] ?? null;
     },
@@ -89,6 +90,14 @@ export const useUser = (id?: string) => {
           : {
               ...mapClientRowToFormObject(client),
               id: client.id,
+              workoutsGroup:
+                client.workouts_group === null
+                  ? undefined
+                  : client.workouts_group,
+              workoutsSolo:
+                client.workouts_solo === null
+                  ? undefined
+                  : client.workouts_solo,
             };
       },
       enabled: !!client && !!clientQuery && !!id,
@@ -120,6 +129,28 @@ export const useMutateUsers = () => {
           return queryClient.invalidateQueries([QUERY_KEYS.clients]);
         }
       },
+    }
+  );
+
+  const updateUserField = useMutation(
+    async ({
+      id,
+      field,
+      value,
+    }: {
+      id: string;
+      field: keyof ClientRow;
+      value: any;
+    }) => {
+      const response = await client
+        ?.from<DatabaseTables.CLIENTS, ClientTable>(DatabaseTables.CLIENTS)
+        .update({ [field]: value })
+        .eq("id", id);
+      return {
+        status: response?.status,
+        statusText: response?.statusText,
+        error: response?.error,
+      };
     }
   );
 
@@ -178,5 +209,8 @@ export const useMutateUsers = () => {
     updateAsync: updateUser.mutateAsync,
     isLoadingUpdate: updateUser.isLoading,
     isSuccessUpdate: updateUser.isSuccess,
+    updateField: updateUserField.mutate,
+    updateFieldAsync: updateUserField.mutateAsync,
+    isLoadingUpdateField: updateUserField.isLoading,
   };
 };

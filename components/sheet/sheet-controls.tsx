@@ -5,9 +5,14 @@ import { Check, X } from "@tamagui/lucide-icons";
 type Props = {
   handleConfirm: () => void;
   handleCancel: () => void;
+  confirmDisabled?: boolean;
 };
 
-export const SheetControls = ({ handleConfirm, handleCancel }: Props) => {
+export const SheetControls = ({
+  handleConfirm,
+  handleCancel,
+  confirmDisabled = false,
+}: Props) => {
   return (
     <AnimatePresence>
       <XStack
@@ -41,6 +46,7 @@ export const SheetControls = ({ handleConfirm, handleCancel }: Props) => {
         <Button
           circular
           icon={X}
+          disabled={confirmDisabled}
           onPress={handleCancel}
           bg="$warning"
           pressStyle={{

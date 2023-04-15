@@ -4,6 +4,7 @@ export enum DatabaseTables {
   CLIENTS = "clients",
   APPOINTMENTS = "appointments",
   CLIENT_APPOINTMENTS = "client_appointments",
+  PAYMENTS = "payments",
 }
 
 export type ClientTable =
@@ -15,3 +16,8 @@ export type AppointmentTable =
   Database["public"]["Tables"][DatabaseTables.APPOINTMENTS];
 export type AppointmentRow =
   Database["public"]["Tables"][DatabaseTables.APPOINTMENTS]["Row"];
+
+export type PaymentTable =
+  Database["public"]["Tables"][DatabaseTables.PAYMENTS];
+export type PaymentRow =
+  Database["public"]["Tables"][DatabaseTables.PAYMENTS]["Row"];

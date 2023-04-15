@@ -26,10 +26,12 @@
 - [x] tabbed header component
 - [x] make tabbed header component show only for an existing user
 - [ ] add amount of workouts to the client
+  - [ ] TODO: fix the query not refetching useUser(byId) after we invalidate the query adding the workout values
 - [ ] add a boolean to the client payment saying they want solo workouts
 - [ ] if we have an appointment taken by the solo user, prevent it from being picked
   - [ ] make time picker to now allow picking non-working time also
 - [ ] client profile: add measurements
+- [x] handle possibility of one payment update query failing and rollback the previous one
 
 ## UI
 
