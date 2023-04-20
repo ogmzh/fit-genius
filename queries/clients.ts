@@ -26,7 +26,8 @@ export const useUsersData = () => {
     ?.from<DatabaseTables.CLIENTS, ClientTable>(DatabaseTables.CLIENTS)
     .select("*", {
       count: "exact",
-    });
+    })
+    .order("first_name", { ascending: true });
 
   const { data, isLoading, isStale } = useQuery<
     { clients: ClientRow[]; count: number },
@@ -70,14 +71,13 @@ export const useUser = (id?: string) => {
     })
     .eq("id", id);
 
-  const { data, isLoading } = useQuery<
+  const { data, isLoading, isStale } = useQuery<
     ClientRow | null,
     PostgrestError,
     ClientUser | null
   >(
     [QUERY_KEYS.clients, id],
     async () => {
-      console.log("fetching user by id", id);
       const response = await clientQuery;
       return response?.data?.[0] ?? null;
     },
@@ -87,23 +87,12 @@ export const useUser = (id?: string) => {
         // client can be prefetched (preloaded) on user-list screen
         return "firstName" in client
           ? client
-          : {
-              ...mapClientRowToFormObject(client),
-              id: client.id,
-              workoutsGroup:
-                client.workouts_group === null
-                  ? undefined
-                  : client.workouts_group,
-              workoutsSolo:
-                client.workouts_solo === null
-                  ? undefined
-                  : client.workouts_solo,
-            };
+          : mapClientRowToFormObject(client);
       },
       enabled: !!client && !!clientQuery && !!id,
     }
   );
-  return { data, isLoading };
+  return { data, isLoading, isStale };
 };
 
 export const useMutateUsers = () => {
@@ -151,6 +140,13 @@ export const useMutateUsers = () => {
         statusText: response?.statusText,
         error: response?.error,
       };
+    },
+    {
+      onSuccess: (data, { id }) => {
+        if (data.status === HttpStatusCode.NO_CONTENT) {
+          return queryClient.invalidateQueries([QUERY_KEYS.clients, id]);
+        }
+      },
     }
   );
 

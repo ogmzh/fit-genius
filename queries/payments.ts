@@ -22,6 +22,7 @@ export const usePayments = (clientId?: string) => {
     .select("*", {
       count: "exact",
     })
+    .order("created_at", { ascending: false })
     .eq("client_id", clientId);
 
   const { data, isLoading } = useQuery<
@@ -92,10 +93,9 @@ export const useMutatePayments = () => {
     {
       onSuccess: (data, { userId }) => {
         if (data.status === HttpStatusCode.CREATED) {
-          console.log("are you invalidating", userId);
           return queryClient.invalidateQueries([
-            [QUERY_KEYS.payments],
-            [QUERY_KEYS.clients, userId],
+            QUERY_KEYS.payments,
+            userId,
           ]);
         }
       },

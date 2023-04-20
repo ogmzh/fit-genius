@@ -2,6 +2,7 @@ import { formatISO } from "date-fns";
 
 import { ClientRow } from "./types/database";
 import { ClientUserSchema } from "./validation/client";
+import { ClientUser } from "./types/entities";
 
 export const EVENT_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 export const HUMAN_DATE_FORMAT = "MMM dd. yyyy";
@@ -9,9 +10,8 @@ export const SQL_DATE_FORMAT = "yyyy-MM-dd";
 export const TIME_FORMAT = "HH:mm";
 export const CALENDAR_DATE_FORMAT = `${SQL_DATE_FORMAT} ${TIME_FORMAT}`;
 
-export const mapClientRowToFormObject = (
-  row: ClientRow
-): ClientUserSchema => ({
+export const mapClientRowToFormObject = (row: ClientRow): ClientUser => ({
+  id: row.id,
   firstName: row.first_name ?? "",
   lastName: row.last_name ?? "",
   email: row.email ?? "",
@@ -21,6 +21,8 @@ export const mapClientRowToFormObject = (
   weight: row.weight ?? "",
   goals: row.goals ?? "",
   notes: row.notes ?? "",
+  workoutsGroup: row.workouts_group ?? 0,
+  workoutsSolo: row.workouts_solo ?? 0,
 });
 
 export const mapFormObjectToClientRow = (

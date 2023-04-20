@@ -2,12 +2,7 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import Toast, {
-  BaseToast,
-  BaseToastProps,
-  ErrorToast,
-} from "react-native-toast-message";
+import Toast from "react-native-toast-message";
 import { TamaguiProvider, Theme } from "tamagui";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,9 +12,9 @@ import {
   AppThemeContextProvider,
 } from "../shared/providers/app-theme-context-provider";
 import { SupabaseClientProvider } from "../shared/supabase.provider";
+import { toastConfig } from "../shared/toast";
 import client from "../supabase";
 import config from "../tamagui.config";
-import { toastConfig } from "../shared/toast";
 
 export { ErrorBoundary } from "expo-router";
 

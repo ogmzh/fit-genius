@@ -1,4 +1,12 @@
-import { H4, Input, Paragraph, Spinner, XStack, YStack } from "tamagui";
+import {
+  H4,
+  Input,
+  Paragraph,
+  Spinner,
+  XStack,
+  YStack,
+  ScrollView,
+} from "tamagui";
 import ScreenContainer from "../components/screen-container";
 import { FloatingActionButton } from "../components/floating-action-button";
 import { useEffect, useState } from "react";
@@ -9,6 +17,8 @@ import { ThumbSwitch } from "../components/thumb-switch";
 import { useMutatePayments, usePayments } from "../queries/payments";
 import { useMutateUsers, useUser } from "../queries/clients";
 import HttpStatusCode from "../shared/http-status-codes";
+import { HUMAN_DATE_FORMAT } from "../shared/utils";
+import { format } from "date-fns";
 
 export const Payments = () => {
   const [showSheet, setShowSheet] = useState(false);
@@ -22,7 +32,7 @@ export const Payments = () => {
 
   const { data: user } = useUser(userId);
 
-  const { data: payments, isLoading } = usePayments(userId);
+  const { data: paymentData, isLoading } = usePayments(userId);
   const {
     createAsync: createPaymentAsync,
     isLoading: isMutatingPayments,
@@ -143,6 +153,32 @@ export const Payments = () => {
           </YStack>
         </XStack>
       </YStack>
+      <ScrollView bg="$background" width="80%" alignSelf="center" mt="$5">
+        {paymentData?.payments?.map(payment => (
+          <XStack
+            key={payment.id}
+            px="$4"
+            py="$3"
+            br="$2"
+            bw="$0.5"
+            boc="$secondarySoft"
+            ai="center"
+            jc="space-between"
+            mt="$3">
+            <YStack>
+              <Paragraph fontSize="$4">
+                {payment.isSolo ? "Solo" : "Group"}
+              </Paragraph>
+              <Paragraph fontSize="$3" color="$textSoft">
+                {payment.workouts} workouts
+              </Paragraph>
+            </YStack>
+            <Paragraph fontSize="$3" color="$textSoft">
+              {format(payment.createdAt, HUMAN_DATE_FORMAT)}
+            </Paragraph>
+          </XStack>
+        ))}
+      </ScrollView>
       <BottomSheet
         snapPoints={[45]}
         handleDismiss={() => setShowSheet(false)}
