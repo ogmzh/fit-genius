@@ -27,7 +27,10 @@
 - [x] make tabbed header component show only for an existing user
 - [x] add amount of workouts to the client
   - [x] fix the query not refetching useUser(byId) after we invalidate the query adding the workout values
-- [ ] add a boolean to the client payment saying they want solo workouts
+- [x] add a boolean to the client payment saying they want solo workouts
+- [x] show numbers of workouts remaining for the user on the appointment selection
+- [ ] create a filter button section on appointments to filter solo, group and all users (hide the ones that have 0 workouts left by default)
+- [ ] select a single user for a solo workout (if they ave solo workouts remaining)
 - [ ] if we have an appointment taken by the solo user, prevent it from being picked
   - [ ] make time picker to now allow picking non-working time also
 - [ ] client profile: add measurements

@@ -17,7 +17,7 @@ import { ThumbSwitch } from "../components/thumb-switch";
 import { useMutatePayments, usePayments } from "../queries/payments";
 import { useMutateUsers, useUser } from "../queries/clients";
 import HttpStatusCode from "../shared/http-status-codes";
-import { HUMAN_DATE_FORMAT } from "../shared/utils";
+import { HUMAN_DATE_FORMAT, getWorkoutCountColor } from "../shared/utils";
 import { format } from "date-fns";
 
 export const Payments = () => {
@@ -120,13 +120,7 @@ export const Payments = () => {
               <YStack ai="center" ml="$6">
                 <Paragraph
                   size="$9"
-                  color={
-                    soloWorkouts > 4
-                      ? "$accent"
-                      : soloWorkouts > 0
-                      ? "$warning"
-                      : "$danger"
-                  }>
+                  color={getWorkoutCountColor(soloWorkouts)}>
                   {soloWorkouts}
                 </Paragraph>
                 <Paragraph fontSize="$2" color="$textSoft">
@@ -136,13 +130,7 @@ export const Payments = () => {
               <YStack ai="center" mr="$6">
                 <Paragraph
                   size="$9"
-                  color={
-                    groupWorkouts > 4
-                      ? "$accent"
-                      : groupWorkouts > 0
-                      ? "$warning"
-                      : "$danger"
-                  }>
+                  color={getWorkoutCountColor(groupWorkouts)}>
                   {groupWorkouts}
                 </Paragraph>
                 <Paragraph fontSize="$2" color="$textSoft">

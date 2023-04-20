@@ -3,7 +3,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import Toast from "react-native-toast-message";
-import { XStack, YStack, useTheme } from "tamagui";
+import { Paragraph, XStack, YStack, useTheme } from "tamagui";
 
 import { useIsFocused } from "@react-navigation/native";
 
@@ -19,7 +19,11 @@ import {
 import { useUsersData } from "../queries/clients";
 import { toastWarningStyleProps } from "../shared/toast";
 import { ClientUser } from "../shared/types/entities";
-import { EVENT_TIME_FORMAT, SQL_DATE_FORMAT } from "../shared/utils";
+import {
+  EVENT_TIME_FORMAT,
+  SQL_DATE_FORMAT,
+  getWorkoutCountColor,
+} from "../shared/utils";
 import { DebouncedInput } from "../components/debounced-input";
 import useSearch from "../shared/hooks/use-search";
 
@@ -208,8 +212,28 @@ const NewAppointmentScreen = () => {
               isSelected={selectedUsers.some(
                 selectedUser => selectedUser.id === user.id
               )}
-              onPress={() => toggleSelectedUser(user)}
-            />
+              onPress={() => toggleSelectedUser(user)}>
+              <XStack gap="$2">
+                {Boolean(user.workoutsGroup) && (
+                  <YStack ai="center" mr="$2">
+                    <Paragraph>Solo</Paragraph>
+                    <Paragraph
+                      color={getWorkoutCountColor(user.workoutsGroup!)}>
+                      {user.workoutsGroup}
+                    </Paragraph>
+                  </YStack>
+                )}
+                {Boolean(user.workoutsSolo) && (
+                  <YStack ai="center">
+                    <Paragraph>Group</Paragraph>
+                    <Paragraph
+                      color={getWorkoutCountColor(user.workoutsSolo!)}>
+                      {user.workoutsSolo}
+                    </Paragraph>
+                  </YStack>
+                )}
+              </XStack>
+            </ClientCard>
           )}
           keyExtractor={item => item.id!}
           contentContainerStyle={{ paddingBottom: 200 }}

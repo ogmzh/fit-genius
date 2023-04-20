@@ -50,3 +50,13 @@ export const mapFormObjectToClientRow = (
   goals: formObject.goals || null,
   notes: formObject.notes || null,
 });
+
+export const getWorkoutCountColor = (count: number): string => {
+  if (count > 4) {
+    return "$accent";
+  }
+  if (count > 0) {
+    return "$warning";
+  }
+  return "$danger";
+};
