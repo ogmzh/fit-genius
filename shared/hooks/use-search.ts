@@ -4,6 +4,7 @@ import Fuse from "fuse.js";
 interface Props<T extends Object> {
   data: T[];
   keys: Array<keyof T>;
+  filter: ((element: T) => boolean) | null;
 }
 
 const SCORE_THRESHOLD = 0.3;
@@ -11,6 +12,7 @@ const SCORE_THRESHOLD = 0.3;
 export default function useSearch<T extends Object>({
   data,
   keys,
+  filter,
 }: Props<T>): {
   searchQuery: string;
   search: (value: string) => void;
@@ -28,17 +30,32 @@ export default function useSearch<T extends Object>({
   }, [data, keys]);
 
   const results = useMemo(() => {
-    if (!searchQuery) return data;
+    if (!searchQuery && !filter) return data;
 
-    const searchResults = fuse.search(searchQuery);
+    console.log("search hook", filter);
 
-    return searchResults
-      .filter(
-        fuseResult =>
-          fuseResult.score && fuseResult.score < SCORE_THRESHOLD
-      )
-      .map(fuseResult => fuseResult.item);
-  }, [fuse, searchQuery, data]);
+    const searchResults: Fuse.FuseResult<T>[] = searchQuery
+      ? fuse.search(searchQuery)
+      : data.map(item => ({ item, score: 0, refIndex: 0 }));
+
+    return filter === null
+      ? searchResults
+          .filter(
+            fuseResult =>
+              fuseResult.score && fuseResult.score < SCORE_THRESHOLD
+          )
+          .map(fuseResult => fuseResult.item)
+      : searchResults
+          .filter(
+            fuseResult =>
+              fuseResult.score && fuseResult.score < SCORE_THRESHOLD
+          )
+          .map(fuseResult => fuseResult.item)
+          .filter(element => {
+            console.log("debugging", element.workoutGroup);
+            return filter(element);
+          });
+  }, [fuse, searchQuery, data, filter]);
 
   return {
     searchQuery,

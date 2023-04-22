@@ -47,3 +47,7 @@
 ## Components
 
 - [x] sheet to reusable component with multiple snap points
+
+## Bugs
+
+- [ ] date picker is always preselected on "today" instead on selected

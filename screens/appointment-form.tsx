@@ -3,20 +3,31 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import Toast from "react-native-toast-message";
-import { Paragraph, XStack, YStack, useTheme } from "tamagui";
+import {
+  AnimatePresence,
+  Button,
+  Paragraph,
+  XStack,
+  YStack,
+  useTheme,
+} from "tamagui";
 
 import { useIsFocused } from "@react-navigation/native";
 
+import { Filter } from "@tamagui/lucide-icons";
 import { ActionButton } from "../components/action-button";
 import { AppointmentPicker } from "../components/appointment-picker";
 import { BackdropSpinner } from "../components/backdrop-spinner";
+import { Chip } from "../components/chip";
 import { ClientCard } from "../components/client-card";
+import { DebouncedInput } from "../components/debounced-input";
 import ScreenContainer from "../components/screen-container";
 import {
   useAppointmentsData,
   useMutateAppointments,
 } from "../queries/appointments";
 import { useUsersData } from "../queries/clients";
+import useSearch from "../shared/hooks/use-search";
 import { toastWarningStyleProps } from "../shared/toast";
 import { ClientUser } from "../shared/types/entities";
 import {
@@ -24,8 +35,6 @@ import {
   SQL_DATE_FORMAT,
   getWorkoutCountColor,
 } from "../shared/utils";
-import { DebouncedInput } from "../components/debounced-input";
-import useSearch from "../shared/hooks/use-search";
 
 const now = new Date();
 
@@ -42,6 +51,8 @@ const NewAppointmentScreen = () => {
     queryDate ? new Date(queryDate) : now
   );
   const [selectedUsers, setSelectedUsers] = useState<ClientUser[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filter, setFilter] = useState<"group" | "solo" | null>(null);
 
   const isFocused = useIsFocused();
   const theme = useTheme();
@@ -58,11 +69,18 @@ const NewAppointmentScreen = () => {
   const { data: clientData } = useUsersData();
 
   const {
-    results: filteredClients,
+    results: searchResults,
     searchQuery,
     search,
   } = useSearch<ClientUser>({
     data: clientData?.clients ?? [],
+    filter:
+      filter === null
+        ? null
+        : (client: ClientUser) =>
+            filter === "group"
+              ? Boolean(client.workoutsGroup && client.workoutsGroup > 0)
+              : Boolean(client.workoutsSolo && client.workoutsSolo > 0),
     keys: ["firstName", "lastName", "email"],
   });
 
@@ -178,10 +196,20 @@ const NewAppointmentScreen = () => {
     }
   };
 
+  const handlePressChip = (nextFilter: "group" | "solo") => {
+    if (filter === "group" && nextFilter === "group") {
+      setFilter(null);
+    } else if (filter === "solo" && nextFilter === "solo") {
+      setFilter(null);
+    } else {
+      setFilter(nextFilter);
+    }
+  };
+
   return (
     <ScreenContainer>
       <BackdropSpinner visible={isMutating} />
-      <YStack mb="$12">
+      <YStack mb="$16">
         <AppointmentPicker
           date={selectedDate}
           onDateChange={setSelectedDate}
@@ -191,19 +219,58 @@ const NewAppointmentScreen = () => {
           onTimeToChange={setTimeTo}
           disabled={isMutating}
         />
-        <DebouncedInput
-          containerProps={{
-            mb: "$4",
-            mx: "$6",
-          }}
-          inputProps={{
-            placeholder: "Search...",
-          }}
-          value={searchQuery}
-          onValueChange={value => search(value)}
-        />
+        <XStack px="$5" mx="$2" alignSelf="center" ai="center" mb="$3">
+          <DebouncedInput
+            containerProps={{
+              flex: 1,
+              mr: "$3",
+            }}
+            inputProps={{
+              placeholder: "Search...",
+            }}
+            value={searchQuery}
+            onValueChange={value => search(value)}
+          />
+
+          <Button
+            iconAfter={<Filter color="white" />}
+            onPress={() => setShowFilters(previous => !previous)}
+            bg="$secondary"
+            pressStyle={{
+              backgroundColor: "$secondarySoft",
+            }}
+          />
+        </XStack>
+        <AnimatePresence>
+          {showFilters && (
+            <XStack
+              mb="$3"
+              px="$5"
+              animation="smooth"
+              gap="$2"
+              key="filters"
+              enterStyle={{
+                opacity: 0,
+              }}
+              exitStyle={{
+                opacity: 0,
+              }}>
+              <Chip
+                label="Solo"
+                checked={filter === "solo"}
+                onPress={() => handlePressChip("solo")}
+              />
+              <Chip
+                label="Group"
+                checked={filter === "group"}
+                onPress={() => handlePressChip("group")}
+              />
+            </XStack>
+          )}
+        </AnimatePresence>
+
         <FlatList
-          data={filteredClients}
+          data={searchResults}
           renderItem={({ item: user }) => (
             <ClientCard
               firstName={user.firstName}

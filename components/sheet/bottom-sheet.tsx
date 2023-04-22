@@ -25,7 +25,7 @@ export const BottomSheet = ({
       dismissOnSnapToBottom
       dismissOnOverlayPress
       onOpenChange={handleDismiss}>
-      <Sheet.Overlay bg="$backgroundSoft" />
+      <Sheet.Overlay elevate />
       {!hideDragHandle && <Sheet.Handle bg="$primary" />}
       <Sheet.Frame f={1} p="$4" space="$5" borderTopColor="red">
         {children}
