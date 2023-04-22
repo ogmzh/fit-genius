@@ -29,12 +29,26 @@
   - [x] fix the query not refetching useUser(byId) after we invalidate the query adding the workout values
 - [x] add a boolean to the client payment saying they want solo workouts
 - [x] show numbers of workouts remaining for the user on the appointment selection
-- [ ] create a filter button section on appointments to filter solo, group and all users (hide the ones that have 0 workouts left by default)
+- [x] create a filter button section on appointments to filter solo, group and all users (hide the ones that have 0 workouts left by default)
 - [ ] select a single user for a solo workout (if they ave solo workouts remaining)
 - [ ] if we have an appointment taken by the solo user, prevent it from being picked
   - [ ] make time picker to now allow picking non-working time also
 - [ ] client profile: add measurements
 - [x] handle possibility of one payment update query failing and rollback the previous one
+
+## Exercises
+
+- [ ] tab for exercises
+  - [ ] exercise should have a name, type (reps or duration), and a link to a video
+- [ ] create exercises
+- [ ] list exercises
+- [ ] update an exercise
+- [ ] delete an exercise
+
+## Workouts
+
+- workout is a specific set of exercises for a client on a given day
+- refine tasks
 
 ## UI
 
