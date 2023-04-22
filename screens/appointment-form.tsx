@@ -7,6 +7,7 @@ import {
   AnimatePresence,
   Button,
   Paragraph,
+  Stack,
   XStack,
   YStack,
   useTheme,
@@ -35,6 +36,7 @@ import {
   SQL_DATE_FORMAT,
   getWorkoutCountColor,
 } from "../shared/utils";
+import { FilterButton } from "../components/filter-button";
 
 const now = new Date();
 
@@ -245,14 +247,10 @@ const NewAppointmentScreen = () => {
             value={searchQuery}
             onValueChange={value => search(value)}
           />
-
-          <Button
-            iconAfter={<Filter color="white" />}
+          <FilterButton
+            activeFilters={filters.size}
+            showFilterCount={!showFilters && filters.size > 0}
             onPress={() => setShowFilters(previous => !previous)}
-            bg="$secondary"
-            pressStyle={{
-              backgroundColor: "$secondarySoft",
-            }}
           />
         </XStack>
         <AnimatePresence>
