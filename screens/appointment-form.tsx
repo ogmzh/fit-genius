@@ -52,7 +52,7 @@ const NewAppointmentScreen = () => {
   );
   const [selectedUsers, setSelectedUsers] = useState<ClientUser[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [filter, setFilter] = useState<"group" | "solo" | null>(null);
+  const [filters, setFilters] = useState<Set<"group" | "solo">>(new Set());
 
   const isFocused = useIsFocused();
   const theme = useTheme();
@@ -75,12 +75,27 @@ const NewAppointmentScreen = () => {
   } = useSearch<ClientUser>({
     data: clientData?.clients ?? [],
     filter:
-      filter === null
+      filters.size === 0
         ? null
-        : (client: ClientUser) =>
-            filter === "group"
-              ? Boolean(client.workoutsGroup && client.workoutsGroup > 0)
-              : Boolean(client.workoutsSolo && client.workoutsSolo > 0),
+        : (client: ClientUser) => {
+            let result = true;
+            for (const filter of filters) {
+              if (filter === "group") {
+                result =
+                  result &&
+                  Boolean(
+                    client.workoutsGroup && client.workoutsGroup > 0
+                  );
+              }
+              if (filter === "solo") {
+                result =
+                  result &&
+                  Boolean(client.workoutsSolo && client.workoutsSolo > 0);
+              }
+            }
+
+            return result;
+          },
     keys: ["firstName", "lastName", "email"],
   });
 
@@ -195,14 +210,13 @@ const NewAppointmentScreen = () => {
       canGoBack() && goBack();
     }
   };
-
   const handlePressChip = (nextFilter: "group" | "solo") => {
-    if (filter === "group" && nextFilter === "group") {
-      setFilter(null);
-    } else if (filter === "solo" && nextFilter === "solo") {
-      setFilter(null);
+    if (filters.has(nextFilter)) {
+      setFilters(
+        new Set([...filters].filter(filter => filter !== nextFilter))
+      );
     } else {
-      setFilter(nextFilter);
+      setFilters(new Set([...filters, nextFilter]));
     }
   };
 
@@ -245,7 +259,7 @@ const NewAppointmentScreen = () => {
           {showFilters && (
             <XStack
               mb="$3"
-              px="$5"
+              px="$7"
               animation="smooth"
               gap="$2"
               key="filters"
@@ -257,12 +271,12 @@ const NewAppointmentScreen = () => {
               }}>
               <Chip
                 label="Solo"
-                checked={filter === "solo"}
+                checked={filters.has("solo")}
                 onPress={() => handlePressChip("solo")}
               />
               <Chip
                 label="Group"
-                checked={filter === "group"}
+                checked={filters.has("group")}
                 onPress={() => handlePressChip("group")}
               />
             </XStack>
@@ -283,7 +297,7 @@ const NewAppointmentScreen = () => {
               <XStack gap="$2">
                 {Boolean(user.workoutsGroup) && (
                   <YStack ai="center" mr="$2">
-                    <Paragraph>Solo</Paragraph>
+                    <Paragraph>Group</Paragraph>
                     <Paragraph
                       color={getWorkoutCountColor(user.workoutsGroup!)}>
                       {user.workoutsGroup}
@@ -292,7 +306,7 @@ const NewAppointmentScreen = () => {
                 )}
                 {Boolean(user.workoutsSolo) && (
                   <YStack ai="center">
-                    <Paragraph>Group</Paragraph>
+                    <Paragraph>Solo</Paragraph>
                     <Paragraph
                       color={getWorkoutCountColor(user.workoutsSolo!)}>
                       {user.workoutsSolo}

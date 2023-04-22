@@ -32,8 +32,6 @@ export default function useSearch<T extends Object>({
   const results = useMemo(() => {
     if (!searchQuery && !filter) return data;
 
-    console.log("search hook", filter);
-
     const searchResults: Fuse.FuseResult<T>[] = searchQuery
       ? fuse.search(searchQuery)
       : data.map(item => ({ item, score: 0, refIndex: 0 }));
@@ -42,19 +40,18 @@ export default function useSearch<T extends Object>({
       ? searchResults
           .filter(
             fuseResult =>
-              fuseResult.score && fuseResult.score < SCORE_THRESHOLD
+              fuseResult.score !== undefined &&
+              fuseResult.score < SCORE_THRESHOLD
           )
           .map(fuseResult => fuseResult.item)
       : searchResults
           .filter(
             fuseResult =>
-              fuseResult.score && fuseResult.score < SCORE_THRESHOLD
+              fuseResult.score !== undefined &&
+              fuseResult.score < SCORE_THRESHOLD
           )
           .map(fuseResult => fuseResult.item)
-          .filter(element => {
-            console.log("debugging", element.workoutGroup);
-            return filter(element);
-          });
+          .filter(element => filter(element));
   }, [fuse, searchQuery, data, filter]);
 
   return {
