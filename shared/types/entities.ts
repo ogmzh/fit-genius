@@ -15,8 +15,22 @@ export type NewAppointment = Pick<AppointmentRow, "day"> & {
 
 export type ExtendedAppointmentRow = AppointmentRow & {
   clients:
-    | Pick<ClientRow, "first_name" | "last_name" | "email">
-    | Pick<ClientRow, "first_name" | "last_name" | "email">[]
+    | Pick<
+        ClientRow,
+        | "first_name"
+        | "last_name"
+        | "email"
+        | "workouts_group"
+        | "workouts_solo"
+      >
+    | Pick<
+        ClientRow,
+        | "first_name"
+        | "last_name"
+        | "email"
+        | "workouts_group"
+        | "workouts_solo"
+      >[]
     | null;
 };
 

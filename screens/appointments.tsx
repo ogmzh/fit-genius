@@ -229,9 +229,14 @@ const AppointmentScreen = () => {
                 eventTitle: {
                   color: text.val,
                   fontWeight: "bold",
+                  fontSize: 16,
+                },
+                eventSummary: {
+                  color: text.val,
+                  fontSize: 12,
                 },
                 eventTimes: {
-                  color: textSoft.val,
+                  color: text.val,
                 },
                 event: {
                   borderRadius: 4,

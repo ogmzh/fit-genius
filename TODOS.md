@@ -30,11 +30,14 @@
 - [x] add a boolean to the client payment saying they want solo workouts
 - [x] show numbers of workouts remaining for the user on the appointment selection
 - [x] create a filter button section on appointments to filter solo, group and all users (hide the ones that have 0 workouts left by default)
-- [ ] select a single user for a solo workout (if they ave solo workouts remaining)
-- [ ] if we have an appointment taken by the solo user, prevent it from being picked
-  - [ ] make time picker to now allow picking non-working time also
+- [x] select a single user for a solo workout (if they ave solo workouts remaining)
 - [ ] client profile: add measurements
 - [x] handle possibility of one payment update query failing and rollback the previous one
+
+### consider:
+
+- [ ] if we have an appointment taken by the solo user, prevent|warn it from being picked
+  - [ ] time picker should not let us pick non-working time
 
 ## Exercises
 

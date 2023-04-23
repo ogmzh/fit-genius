@@ -33,13 +33,15 @@ export const useAppointmentsData = (
   to?: Date | null
 ) => {
   const { client } = useSupabase();
-  const { backgroundSoft } = useTheme();
+  const { backgroundSoft, primary } = useTheme();
 
   const clientQuery = client
     ?.from<DatabaseTables.APPOINTMENTS, AppointmentTable>(
       DatabaseTables.APPOINTMENTS
     )
-    .select("*, clients(first_name, last_name, email)")
+    .select(
+      "*, clients(first_name, last_name, email, workouts_group, workouts_solo)"
+    )
     .gte("day", format(from ?? new Date(), SQL_DATE_FORMAT))
     .lte("day", format(to ?? new Date(), SQL_DATE_FORMAT));
 
@@ -69,22 +71,49 @@ export const useAppointmentsData = (
             const formatDateTime = (time: string) =>
               format(parseISO(`${day}T${time}`), EVENT_TIME_FORMAT);
             if (clients) {
-              const eventId = `{"appointment_id":"${id}", "client_id":"${client_id}"}`;
+              // since the EventSchedule type is a bit scuffed, need to pass additional info through somewhere
+              const isSolo = Array.isArray(clients)
+                ? Boolean(
+                    clients[0].workouts_solo &&
+                      clients[0].workouts_solo > 0
+                  )
+                : Boolean(
+                    clients.workouts_solo && clients.workouts_solo > 0
+                  );
+
+              const remainingSoloWorkouts = Array.isArray(clients)
+                ? clients[0].workouts_solo
+                : clients.workouts_solo;
+
+              const remainingGroupWorkouts = Array.isArray(clients)
+                ? clients[0].workouts_group
+                : clients.workouts_group;
+              const eventId = `{"appointment_id":"${id}", "client_id":"${client_id}", "solo": "${isSolo}"}`;
               if (schedule[day]) {
                 Array.isArray(clients)
                   ? schedule[day].push({
                       id: eventId,
                       title: `${clients[0].first_name} ${clients[0].last_name}`,
+                      summary: isSolo
+                        ? `Solo \n${remainingSoloWorkouts ?? 0} remaining`
+                        : `Group \n${
+                            remainingGroupWorkouts ?? 0
+                          } remaining`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
-                      color: "red",
+                      color: isSolo ? primary.val : backgroundSoft.val,
                     })
                   : schedule[day].push({
                       id: eventId,
                       title: `${clients.first_name} ${clients.last_name}`,
+                      summary: isSolo
+                        ? `Solo \n${remainingSoloWorkouts ?? 0} remaining`
+                        : `Group \n${
+                            remainingGroupWorkouts ?? 0
+                          } remaining`,
                       start: formatDateTime(from),
                       end: formatDateTime(to),
-                      color: backgroundSoft.val,
+                      color: isSolo ? primary.val : backgroundSoft.val,
                     });
               } else {
                 schedule[day] = Array.isArray(clients)
@@ -92,18 +121,32 @@ export const useAppointmentsData = (
                       {
                         id: eventId,
                         title: `${clients[0].first_name} ${clients[0].last_name}`,
+                        summary: isSolo
+                          ? `Solo \n${
+                              remainingSoloWorkouts ?? 0
+                            } remaining`
+                          : `Group \n${
+                              remainingGroupWorkouts ?? 0
+                            } remaining`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
-                        color: "red",
+                        color: isSolo ? primary.val : backgroundSoft.val,
                       },
                     ]
                   : [
                       {
                         id: eventId,
                         title: `${clients.first_name} ${clients.last_name}`,
+                        summary: isSolo
+                          ? `Solo \n${
+                              remainingSoloWorkouts ?? 0
+                            } remaining`
+                          : `Group \n${
+                              remainingGroupWorkouts ?? 0
+                            } remaining`,
                         start: formatDateTime(from),
                         end: formatDateTime(to),
-                        color: backgroundSoft.val,
+                        color: isSolo ? primary.val : backgroundSoft.val,
                       },
                     ];
               }
