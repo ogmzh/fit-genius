@@ -9,5 +9,5 @@
   - note down the app id (`rqavyroelmtspuxnybsz`) on the `/settings/general` page
   ```
       npx supabase login
-      npx supabase gen types typescript --project-id "rqavyroelmtspuxnybsz" --schema public > app/shared/types/supabase.ts
+      npx supabase gen types typescript --project-id "rqavyroelmtspuxnybsz" --schema public > shared/types/generated.ts
   ```
