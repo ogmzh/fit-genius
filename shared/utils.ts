@@ -1,8 +1,9 @@
 import { formatISO } from "date-fns";
 
-import { ClientRow } from "./types/database";
+import { ClientRow, ExerciseRow } from "./types/database";
 import { ClientUserSchema } from "./validation/client";
 import { ClientUser } from "./types/entities";
+import { ExerciseSchema } from "./validation/exercise";
 
 export const EVENT_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 export const HUMAN_DATE_FORMAT = "MMM dd. yyyy";
@@ -49,6 +50,15 @@ export const mapFormObjectToClientRow = (
     : null,
   goals: formObject.goals || null,
   notes: formObject.notes || null,
+});
+
+export const mapFormObjectToExerciseRow = (
+  formObject: ExerciseSchema
+): Omit<ExerciseRow, "id" | "created_at"> => ({
+  name: formObject.name,
+  description: formObject.description || null,
+  link: formObject.link || null,
+  type: formObject.type || null,
 });
 
 export const getWorkoutCountColor = (count: number): string => {

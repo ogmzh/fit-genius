@@ -82,6 +82,32 @@ export interface Database {
           workouts_solo?: number | null
         }
       }
+      exercises: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          link: string | null
+          name: string
+          type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          name: string
+          type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          name?: string
+          type?: string | null
+        }
+      }
       measurements: {
         Row: {
           active_straight_leg_raise_comment: string | null

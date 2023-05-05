@@ -4,10 +4,10 @@ import Fuse from "fuse.js";
 interface Props<T extends Object> {
   data: T[];
   keys: Array<keyof T>;
-  filter: ((element: T) => boolean) | null;
+  filter?: ((element: T) => boolean) | null;
 }
 
-const SCORE_THRESHOLD = 0.3;
+const SCORE_THRESHOLD = 0.5;
 
 export default function useSearch<T extends Object>({
   data,
@@ -36,7 +36,7 @@ export default function useSearch<T extends Object>({
       ? fuse.search(searchQuery)
       : data.map(item => ({ item, score: 0, refIndex: 0 }));
 
-    return filter === null
+    return filter !== undefined && filter !== null
       ? searchResults
           .filter(
             fuseResult =>
@@ -44,14 +44,14 @@ export default function useSearch<T extends Object>({
               fuseResult.score < SCORE_THRESHOLD
           )
           .map(fuseResult => fuseResult.item)
+          .filter(element => filter(element))
       : searchResults
           .filter(
             fuseResult =>
               fuseResult.score !== undefined &&
               fuseResult.score < SCORE_THRESHOLD
           )
-          .map(fuseResult => fuseResult.item)
-          .filter(element => filter(element));
+          .map(fuseResult => fuseResult.item);
   }, [fuse, searchQuery, data, filter]);
 
   return {

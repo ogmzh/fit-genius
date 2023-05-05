@@ -42,7 +42,7 @@
 ## Exercises
 
 - [ ] tab for exercises
-  - [ ] exercise should have a name, type (reps or duration), and a link to a video
+  - [ ] exercise should have a name, tags (push, pull, chest, back etc), type (reps or duration), and a link to a video
 - [ ] create exercises
 - [ ] list exercises
 - [ ] update an exercise
@@ -52,6 +52,7 @@
 
 - workout is a specific set of exercises for a client on a given day
 - refine tasks
+- 1:1 relationship with an appointment ?? or just dump exercises into an appointment ??
 
 ## UI
 
@@ -59,11 +60,9 @@
 - [x] refactor appointment-form and client-user-list user-cards to a component
 - [x] refactor appointment-form and client-user-list form buttons to a component
 - [x] refactor time picker to a component
-- [x] scale the time picker so we can use it in our sheet
-
-## Components
-
 - [x] sheet to reusable component with multiple snap points
+- [x] scale the time picker so we can use it in our sheet
+- [ ] implement an input chips component
 
 ## Bugs
 

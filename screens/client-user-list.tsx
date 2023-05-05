@@ -12,13 +12,10 @@ import ScreenContainer from "../components/screen-container";
 import { QUERY_KEYS } from "../queries";
 import { useMutateUsers, useUsersData } from "../queries/clients";
 import { DebouncedInput } from "../components/debounced-input";
-import { useState } from "react";
 import useSearch from "../shared/hooks/use-search";
 import { ClientUser } from "../shared/types/entities";
 
 export function ClientUserListScreen() {
-  const [searchValue, setSearchValue] = useState("");
-
   const { data, isLoading, isStale } = useUsersData();
 
   const {
@@ -28,6 +25,7 @@ export function ClientUserListScreen() {
   } = useSearch<ClientUser>({
     data: data?.clients ?? [],
     keys: ["firstName", "lastName", "email"],
+    filter: null,
   });
 
   const queryClient = useQueryClient();

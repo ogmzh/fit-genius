@@ -6,13 +6,13 @@ export default function AppointmentStack() {
 
   return (
     <Stack
+      initialRouteName="calendar"
       screenOptions={{
         headerTitle: "Appointments",
         ...stackHeaderProps,
       }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="[appointment]" />
-      <Stack.Screen name="details" />
+      <Stack.Screen name="new" />
+      <Stack.Screen name="calendar" />
     </Stack>
   );
 }

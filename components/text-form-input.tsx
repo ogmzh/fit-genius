@@ -8,7 +8,14 @@ import {
   useController,
 } from "react-hook-form";
 import { KeyboardTypeOptions } from "react-native";
-import { Input, Paragraph, XStack, YStack, useTheme } from "tamagui";
+import {
+  Input,
+  Paragraph,
+  SizeTokens,
+  XStack,
+  YStack,
+  useTheme,
+} from "tamagui";
 
 type Props<T extends FieldValues> = {
   name: Path<T>;
@@ -19,6 +26,7 @@ type Props<T extends FieldValues> = {
   numberOfLines?: number;
   disabled?: boolean;
   dateFormatter?: string;
+  fontSize?: SizeTokens;
 };
 
 const TextFormInput = <T extends FieldValues>({
@@ -29,6 +37,7 @@ const TextFormInput = <T extends FieldValues>({
   numberOfLines,
   dateFormatter,
   disabled,
+  fontSize = "$4",
   keyboardType = "default",
 }: Props<T>) => {
   const { field, fieldState } = useController<T>({
@@ -59,6 +68,7 @@ const TextFormInput = <T extends FieldValues>({
         keyboardType={keyboardType}
         numberOfLines={numberOfLines}
         placeholder={placeholder}
+        fontSize={fontSize}
         onBlur={field.onBlur}
         value={
           dateFormatter

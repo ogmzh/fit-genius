@@ -1,4 +1,9 @@
-import { CalendarCheck, Users, Settings2 } from "@tamagui/lucide-icons";
+import {
+  CalendarCheck,
+  Users,
+  Settings2,
+  Dumbbell,
+} from "@tamagui/lucide-icons";
 import { Tabs } from "expo-router";
 import { useTheme } from "tamagui";
 import { useThemedHeaderProps } from "../../shared/hooks";
@@ -40,6 +45,16 @@ export default function TabLayout() {
             title: "Clients",
             headerShown: false,
             tabBarIcon: ({ color }) => <Users size="$2" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="exercises"
+          options={{
+            title: "Exercises",
+            headerShown: false,
+            tabBarIcon: ({ color }) => (
+              <Dumbbell size="$2" color={color} />
+            ),
           }}
         />
         <Tabs.Screen

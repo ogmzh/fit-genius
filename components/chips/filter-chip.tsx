@@ -8,7 +8,7 @@ type Props = {
   label: string;
 };
 
-export const Chip = ({ checked, onPress, label }: Props) => {
+export const FilterChip = ({ checked, onPress, label }: Props) => {
   return (
     <XStack
       key="check"

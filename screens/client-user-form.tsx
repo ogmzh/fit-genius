@@ -97,7 +97,7 @@ export default function ClientUserFormScreen() {
       <BackdropSpinner visible={isLoadingUpdate || isLoadingCreate} />
       <ScrollView>
         <FormProvider {...methods}>
-          <YStack f={1} px="$4" gap="$2">
+          <YStack px="$4" gap="$2">
             <TextFormInput<ClientUserSchema>
               name="firstName"
               required

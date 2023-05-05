@@ -5,23 +5,21 @@ import { FlatList } from "react-native";
 import Toast from "react-native-toast-message";
 import {
   AnimatePresence,
-  Button,
   Paragraph,
-  Stack,
+  useTheme,
   XStack,
   YStack,
-  useTheme,
 } from "tamagui";
 
 import { useIsFocused } from "@react-navigation/native";
 
-import { Filter } from "@tamagui/lucide-icons";
 import { ActionButton } from "../components/action-button";
 import { AppointmentPicker } from "../components/appointment-picker";
 import { BackdropSpinner } from "../components/backdrop-spinner";
-import { Chip } from "../components/chip";
+import { FilterChip } from "../components/chips/filter-chip";
 import { ClientCard } from "../components/client-card";
 import { DebouncedInput } from "../components/debounced-input";
+import { FilterButton } from "../components/filter-button";
 import ScreenContainer from "../components/screen-container";
 import {
   useAppointmentsData,
@@ -33,10 +31,9 @@ import { toastWarningStyleProps } from "../shared/toast";
 import { ClientUser } from "../shared/types/entities";
 import {
   EVENT_TIME_FORMAT,
-  SQL_DATE_FORMAT,
   getWorkoutCountColor,
+  SQL_DATE_FORMAT,
 } from "../shared/utils";
-import { FilterButton } from "../components/filter-button";
 
 const now = new Date();
 
@@ -59,10 +56,6 @@ const NewAppointmentScreen = () => {
   const isFocused = useIsFocused();
   const theme = useTheme();
 
-  //TODO: figure out what did i want to do with this ID
-  const { appointment: id } = useLocalSearchParams<{
-    appointment: string;
-  }>();
   const { data: selectedDayAppointments } = useAppointmentsData(
     isFocused,
     selectedDate,
@@ -267,12 +260,12 @@ const NewAppointmentScreen = () => {
               exitStyle={{
                 opacity: 0,
               }}>
-              <Chip
+              <FilterChip
                 label="Solo"
                 checked={filters.has("solo")}
                 onPress={() => handlePressChip("solo")}
               />
-              <Chip
+              <FilterChip
                 label="Group"
                 checked={filters.has("group")}
                 onPress={() => handlePressChip("group")}

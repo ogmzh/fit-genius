@@ -1,18 +1,18 @@
 import { Stack } from "expo-router";
 import { useThemedHeaderProps } from "../../../shared/hooks";
 
-export default function UserStack() {
+export default function ExercisesStack() {
   const { stackHeaderProps } = useThemedHeaderProps();
+  console.log("stack");
 
   return (
     <Stack
-      initialRouteName="client-user-list"
+      initialRouteName="list"
       screenOptions={{
-        headerTitle: "Clients",
+        headerTitle: "Exercises",
         ...stackHeaderProps,
       }}>
-      <Stack.Screen name="client-user-list" />
-      <Stack.Screen name="new" />
+      <Stack.Screen name="list" />
     </Stack>
   );
 }
